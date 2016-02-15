@@ -17,7 +17,7 @@ var Loading= React.createClass({
 var styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "black",
+        backgroundColor: "transparent",
         flexDirection: "column",
         justifyContent: "center",
     },

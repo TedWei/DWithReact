@@ -12,26 +12,28 @@ import React,{
     Alert,
 } from 'react-native'
 
-var screen = Dimensions.get('window');
-var WEBVIEW_REF ='webview';
-var utils = require('../components/utils');
-var api = require('../components/api');
+var screen = Dimensions.get('window'),
+	WEBVIEW_REF ='webview',
+	utils = require('../components/utils'),
+	api = require('../components/api');
 var Login = React.createClass({
 	getInitialState(){
 		return {
 			modalOpen:true,
 			isLogining:false,
 			isLogin:false,
+			url:"",
+			loginContent:{},
 		}
 	},
-	closeModal(){
-		var _that= this;
-		function setModalClose(){
-			_that.setState({
-				modalOpen:false,
-			})
-		}
-		Alert.alert('Are you Sure?','Close the login page!',[{text:'Cancel',onPress:()=>console.log('cancel')},{text:'Ok',onPress:()=>setModalClose()}]);
+	_loadInitialState(){
+		var _that = this;
+		api.getAuthorize().then((responseData)=>{
+		   _that.setState({
+		     url:responseData.responseData.url,
+		     loginContent:responseData.responseData,
+		   })
+		})
 	},
 	checkLogin(url){
 		if (url.indexOf(api.getConfig().REDIRECT_URI) >-1){
@@ -62,6 +64,7 @@ var Login = React.createClass({
 		}
 	},
 	componentWillMount(){
+		this._loadInitialState();
 	},
 	goBack() {
 	  this.refs[WEBVIEW_REF].goBack();
@@ -80,34 +83,16 @@ var Login = React.createClass({
 	reload() {
 	  this.refs[WEBVIEW_REF].reload();
 	},
+	_renderView(){
+		return (
+			<WebView ref={WEBVIEW_REF} visible={this.state.modalOpen} startInLoadingState={true} automaticallyAdjustContentInsets={true} scalesPageToFit={true} url={this.state.url} onNavigationStateChange={this.onNavigationStateChange} html={this.state.loginContent._bodyText} style={styles.webview} />
+			)
+	},
 	render(){
 		return(
-		<Modal animated={true} style={styles.modal} visible={this.state.modalOpen}>
+		<Modal animated={true} style={styles.modal} >
 		<View style={styles.container}>
-			<WebView ref={WEBVIEW_REF} startInLoadingState={true} automaticallyAdjustContentInsets={true} scalesPageToFit={true} url={this.props.url} onNavigationStateChange={this.onNavigationStateChange} onLoad={this.onload} style={styles.webview} />
-			<View style={[styles.addressBarRow]}>
-		          <TouchableOpacity
-		            onPress={this.goBack}
-		            style={this.state.backButtonEnabled ? styles.navButton : styles.disabledButton}>
-		            <Text>
-		               {'<'}
-		            </Text>
-		          </TouchableOpacity>
-		          <TouchableOpacity
-		            onPress={this.goForward}
-		            style={this.state.forwardButtonEnabled ? styles.navButton : styles.disabledButton}>
-		            <Text>
-		              {'>'}
-		            </Text>
-		          </TouchableOpacity>
-		          <TouchableOpacity
-		            onPress={this.closeModal}
-		            style={styles.disabledButton}>
-		            <Text>
-		              {'x'}
-		            </Text>
-		          </TouchableOpacity>
-		    </View>
+			{this.state.url ?this._renderView():null}
 		</View>
 		</Modal>
 		)
@@ -116,8 +101,6 @@ var Login = React.createClass({
 
 var HEADER = '#3b5998';
 var BGWASH = 'rgba(255,255,255,0.8)';
-var DISABLED_WASH = 'rgba(255,255,255,0.25)';
-var TEXT_INPUT_REF = 'urlInput';
 
 var styles = StyleSheet.create({
     modal: {
@@ -134,26 +117,6 @@ var styles = StyleSheet.create({
     webView: {
       backgroundColor: BGWASH,
       height: 350,
-    },
-    navButton: {
-      width: 20,
-      padding: 3,
-      marginRight: 3,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: BGWASH,
-      borderColor: 'transparent',
-      borderRadius: 3,
-    },
-    disabledButton: {
-      width: 20,
-      padding: 3,
-      marginRight: 3,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: DISABLED_WASH,
-      borderColor: 'transparent',
-      borderRadius: 3,
     },
 })
 
