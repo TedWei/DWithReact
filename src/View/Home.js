@@ -4,37 +4,61 @@ import React,{
 	NavigatorIOS,
 	TabBarIOS,
 	StyleSheet,
+	TouchableWithoutFeedback,
 } from 'react-native';
 
 var ShotList = require("./ShotList"),
-	Icon = require("react-native-vector-icons/FontAwesome");
+	Icon = require("react-native-vector-icons/FontAwesome"),
+	RCTDeviceEventEmitter = require("RCTDeviceEventEmitter");
 var Home= React.createClass({
 	getInitialState(){
 		return {
 			selectedTab:'default',
+			oldDate:'',
 		}
 	},
 	_renderContent: function(category: string, title: ?string) {
-	  var passProps =   {filter: category};
+	  var passProps = {};
+	  passProps.filter=category;
 	  return (
-	    <NavigatorIOS style={styles.wrapper}
+	    <NavigatorIOS ref="navigator" scroll={this.state.scrollToTop} style={styles.wrapper}
 	      initialRoute={{
 	        component: ShotList,
-	        title: title,
+	        title: "Shots",
 	        passProps: passProps
 	      }}
 	    />
 	  );
 	},
+	_handlePress(){
+		var newDate = Date.now();
+		var oldDate = this.state.oldDate;
+		if (oldDate){
+			if ((newDate-oldDate)<=400){
+				this.setState({
+					oldDate:"",
+				})
+				RCTDeviceEventEmitter.emit('scrollToTop',true);
+			}else{
+				this.setState({
+				  oldDate:newDate,
+				  selectedTab:'default',
+				})
+			}
+		}else{
+			this.setState({
+			  oldDate:newDate,
+			  selectedTab:'default',
+			})
+		}
+	},
 	render(){
 	  return(
 	    <TabBarIOS tintColor={"#ea4c89"}>
-	        <Icon.TabBarItem title="All" iconName="dribbble" selectedIconName="dribbble" selected={this.state.selectedTab === 'default'} onPress={()=>{
-	          this.setState({
-	            selectedTab:'default',
-	          })
-	        }} >
-	        {this._renderContent("default","All")}
+	        <Icon.TabBarItem title="Shots" iconName="dribbble" selectedIconName="dribbble" selected={this.state.selectedTab === 'default'} onPress={()=>{
+	        	this._handlePress()
+	        }}  >
+	        {this._renderContent("default","Shots")}
 	        </Icon.TabBarItem>
 	        <Icon.TabBarItem title="Debuts" iconName="trophy" selectedIconName="trophy" selected={this.state.selectedTab === 'debuts'} onPress={()=>{
 	          this.setState({
@@ -66,7 +90,10 @@ var Home= React.createClass({
 const styles = StyleSheet.create({
   wrapper: {
       flex: 1
-  }
+  },
+  filter:{
+  	backgroundColor:"#000"
+  },
 });
 
 

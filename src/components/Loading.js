@@ -7,7 +7,7 @@ import React,{
 var Loading= React.createClass({
 	render(){
 		return (
-			<View style={[styles.container,styles.center]}>
+			<View style={[styles.container,styles.centerText]}>
 			  <ActivityIndicatorIOS animating={this.props.isLoading} style={styles.spinner} />
 			</View>
 			);

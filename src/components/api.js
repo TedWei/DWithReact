@@ -19,12 +19,20 @@ var API_URL = "https://api.dribbble.com/v1/",
 
 var utils = require('./utils');
 
-function fetchData(URL) {
-    return fetch(URL, {
+function fetchData(URL,setting) {
+    var defaultSetting = {
         headers: {
-            "Authorization": utils.titleCase(ACCESS.token_type)+" " + utils.titleCase(ACCESS.access_token)
+            "Authorization": utils.titleCase(ACCESS.token_type)+" " + ACCESS.access_token
+        },
+    };
+    var setting = utils.extend(defaultSetting,setting);
+    return fetch(URL,setting).then((responseData) => {
+        if (responseData.status ==200 || responseData.status ==201){
+            return responseData.json();
+        }else{
+            return responseData;
         }
-    }).then((responseData) => responseData.json())
+    })
 }
 
 function getConfig(){
@@ -104,10 +112,21 @@ module.exports = {
     getAccessToken:getAccessToken,
     getConfig:getConfig,
     storage:storage,
+    getShotsByType: function(type: string, pageNumber: ?number): ?Object {
+      var URL = API_URL + "shots/?list=" + type;
+      if (pageNumber) {
+        URL += "&per_page=10&page=" + pageNumber;
+      }
+
+      return fetchData(URL);
+    },
     getSingleUser: function(user: ? number): ? Object {
         return fetchData(API_URL + 'users/' + user);
     },
-    getResorces: function(url: ? string): ? Object {
-        return fetchData(url);
-    }
+    getResources: function(url: ? string): ? Object {
+        return fetchData.apply(this,arguments);
+    },
+    request: function(url: ? string ,request: ?Object): ? Object {
+        return fetchData(API_URL + url,request);
+    },
 }

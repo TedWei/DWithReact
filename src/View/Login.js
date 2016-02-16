@@ -29,10 +29,12 @@ var Login = React.createClass({
 	_loadInitialState(){
 		var _that = this;
 		api.getAuthorize().then((responseData)=>{
-		   _that.setState({
-		     url:responseData.responseData.url,
-		     loginContent:responseData.responseData,
-		   })
+			if (responseData.isLogining){
+			   _that.setState({
+			     url:responseData.responseData.url,
+			     loginContent:responseData.responseData,
+			   })
+		   }
 		})
 	},
 	checkLogin(url){

@@ -35,7 +35,15 @@ var utils={
 		tmpArr = str.split("");
 		tmpArr[0] = tmpArr[0].toUpperCase();
 		return tmpArr.join("");
-	}
+	},
+	extend:function(src,target){
+		for (var name in target){
+			if (target.hasOwnProperty(name)){
+				src[name] = target[name];
+			}
+		}
+		return src;
+	},
 };
 
 module.exports = utils
