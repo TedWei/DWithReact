@@ -44,6 +44,15 @@ var utils={
 		}
 		return src;
 	},
+	parseToQuery:function(obj){
+		var tmp = [];
+		for(var name in obj){
+			if (obj.hasOwnProperty(name)){
+				tmp.push(name+"="+obj[name])
+			}
+		}
+		return encodeURI(tmp.join("&"))
+	}
 };
 
 module.exports = utils
