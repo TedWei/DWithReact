@@ -5,10 +5,15 @@ import React,{
 } from 'react-native'
 
 var Loading= React.createClass({
+    getDefaultProps(){
+        return {
+            color:"gray"
+        }
+    },
 	render(){
 		return (
 			<View style={[styles.container,styles.centerText]}>
-			  <ActivityIndicatorIOS animating={this.props.isLoading} style={styles.spinner} />
+			  <ActivityIndicatorIOS color={this.props.color} animating={this.props.isLoading} style={styles.spinner} />
 			</View>
 			);
 	}

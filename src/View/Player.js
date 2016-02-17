@@ -36,6 +36,7 @@ var Player = React.createClass({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
       modalUri:"",
+      loaded:false,
     };
   },
 
@@ -76,13 +77,19 @@ var Player = React.createClass({
       isModalOpen: false
     });
   },
+  _imgLoaded(){
+    this.setState({
+      loaded:true,
+    })
+  },
   _renderModal(){
     if (this.state.modalUri) {
      var modal= (
     <Modal visible={this.state.isModalOpen} animated={true} >
     <TouchableOpacity onPress={this.closeModal}>
       <View style={styles.playerImageModal}>
-      <Image source={{uri:this.state.modalUri}} style={styles.modalImage}
+      {!this.state.loaded?<Loading color={"white"}/>:null}
+      <Image source={{uri:this.state.modalUri}} visible={this.state.loaded} onLoad={this._imgLoaded} style={styles.modalImage}
              />
       </View>
       </TouchableOpacity>
@@ -141,6 +148,7 @@ var Player = React.createClass({
       automaticallyAdjustContentInsets={false}
       keyboardDismissMode="on-drag"
       keyboardShouldPersistTaps={true}
+      pageSize={12}
       showsVerticalScrollIndicator={false}
     />;
   },
@@ -251,7 +259,7 @@ var styles = StyleSheet.create({
   },
   modalImage:{
     width:screen.width * 0.8,
-    // resizeMode: "contain",
+    resizeMode: "contain",
     height: screen.height / 3,
   },
   //playerContent
