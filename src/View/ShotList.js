@@ -15,6 +15,7 @@ var api = require("../components/api");
 var ShotCell = require("./ShotCell"),
     ShotDetails = require("./ShotDetail"),
     ShotFilter = require("./ShotFilter"),
+    Player = require("./Player"),
     Loading = require("../components/Loading"),
     RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
 
@@ -122,7 +123,13 @@ var ShotList = React.createClass({
       resultsCache.dataForQuery[query].length
     );
   },
-
+  selectPlayer: function(player: Object) {
+    this.props.navigator.push({
+      component: Player,
+      passProps: {player:player},
+      title: player.name
+    });
+  },
   onEndReached: function() {
     var query = this.state.filter;
     if (!this.hasMore() || this.state.isLoadingTail) {
@@ -195,6 +202,7 @@ var ShotList = React.createClass({
     return (
       <ShotCell
         onSelect={() => this.selectShot(shot)}
+        onSelectPlayer={()=>this.selectPlayer(shot.user)}
         shot={shot}
       />
     );

@@ -30,6 +30,7 @@ var Icon = require("react-native-vector-icons/FontAwesome"),
 var Player = require("./Player"),
     CommentItem = require("./CommentItem"),
     Shot = require("../model/Shot"),
+    Comment = require("../model/Comment"),
     Loading = require("../components/Loading");
 
 var ShotDetails = React.createClass({
@@ -48,25 +49,6 @@ var ShotDetails = React.createClass({
   componentWillMount(){
     
   },
-
-  _setSpring(){
-    // Initialize the spring that will drive animations
-       this.springSystem = new rebound.SpringSystem();
-       this._scrollSpring = this.springSystem.createSpring();
-       var springConfig = this._scrollSpring.getSpringConfig();
-       springConfig.tension = 230;
-       springConfig.friction = 10;
-
-       this._scrollSpring.addListener({
-         onSpringUpdate: () => {
-           this.setState({heartScale: this._scrollSpring.getCurrentValue()});
-         },
-       });
-
-       // Initialize the spring value at 1
-       this._scrollSpring.setCurrentValue(1);
-  },
-
   openModal: function() {
     this.setState({
       isModalOpen: true
@@ -87,6 +69,13 @@ var ShotDetails = React.createClass({
         dataSource: this.state.dataSource.cloneWithRows(responseData),
         isLoading: false
       });
+      return responseData;
+    }).then((responseData)=>{
+      responseData.map(function(elem, index) {
+        let comment = new Comment(shot.id,elem);
+        comment.getLikes().then((responseData)=>{
+        }).done()
+      })
     }).done();
   },
   _animatedHeart(){

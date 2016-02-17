@@ -26,8 +26,7 @@ var CommentItem = React.createClass({
 
   render: function() {
     return <View>
-      <TouchableHighlight onPress={this.props.onSelect.bind(this, this.props.comment)}
-                          underlayColor={"#f3f3f3"}>
+      <TouchableHighlight onPress={this.props.onSelect.bind(this, this.props.comment)} underlayColor={"#f3f3f3"}>
         <View>
           <View style={styles.commentContent}>
               <Image source={getImage.authorAvatar(this.props.comment.user)}

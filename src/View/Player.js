@@ -22,7 +22,7 @@ var Icon = require("react-native-vector-icons/FontAwesome"),
 
 var api = require("../components/api");
 
-var ShotDetails = require("./ShotDetail");
+var ShotDetail = require("./ShotDetail");
 var ShotCell = require("./ShotCell");
 var Loading = require("../components/Loading");
 
@@ -34,7 +34,8 @@ var Player = React.createClass({
       isLoading: true,
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
-      })
+      }),
+      modalUri:"",
     };
   },
 
@@ -43,6 +44,7 @@ var Player = React.createClass({
 
   componentDidMount:function(){
     api.getResources(this.props.player.shots_url).then((responseData) => {
+      console.log(responseData)
       this.setState({
         dataSource: this.state.dataSource.cloneWithRows(responseData),
         isLoading: false
@@ -60,14 +62,30 @@ var Player = React.createClass({
       isModalOpen: false
     });
   },
-
+  _renderModal(){
+    if (this.state.modalUri) {
+     var modal= (
+    <Modal visible={this.state.isModalOpen} animated={true} >
+    <TouchableOpacity onPress={this.closeModal}>
+      <View style={styles.playerImageModal}>
+      <Image source={{uri:this.state.modalUri}} style={styles.modalImage}
+             />
+      </View>
+      </TouchableOpacity>
+    </Modal>
+    )}else{
+      var modal = null;
+     }
+    return modal;
+  },
   render: function() {
     return (
       <ParallaxView
       windowHeight={260}
       backgroundSource={getImage.authorAvatar(this.props.player)}
       blur={"dark"}
-      header={(
+      >
+      <View>
         <TouchableOpacity onPress={this.openModal}>
           <View style={styles.headerContent}>
             <View style={styles.innerHeaderContent}>
@@ -92,16 +110,11 @@ var Player = React.createClass({
             </View>
           </View>
         </TouchableOpacity>
-      )}
-      >
+      </View>
       <View style={styles.shotList}>
         {this.state.dataSource.length !== 0 ? this.renderShots() : <Loading />}
       </View>
-        <Modal visible={this.state.isModalOpen}
-          onDismiss={this.closeModal}>
-          <Image source={getImage.authorAvatar(this.props.player)}
-                 style={styles.playerImageModal}/>
-        </Modal>
+        {this._renderModal()}
       </ParallaxView>
     );
   },
@@ -109,6 +122,7 @@ var Player = React.createClass({
   renderShots: function() {
     return <ListView
       ref="playerShots"
+      contentContainerStyle={styles.list}
       renderRow={this.renderRow}
       dataSource={this.state.dataSource}
       automaticallyAdjustContentInsets={false}
@@ -122,21 +136,26 @@ var Player = React.createClass({
     return <ShotCell
       onSelect={() => this.selectShot(shot)}
       shot={shot}
+      columns={4}
     />;
   },
 
   selectShot: function(shot: Object) {
-    console.log(shot);
-    debugger;
-    this.props.navigator.push({
-      component: ShotDetails,
-      passProps: {shot},
-      title: shot.title
-    });
+    this.setState({
+      modalUri:shot.images.teaser,
+      isModalOpen:true
+    })
   },
 });
 
 var styles = StyleSheet.create({
+  list:{
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  shotList:{
+    backgroundColor:"#ea4c89",
+  },
   listStyle: {
     flex: 1,
     backgroundColor: "red"
@@ -204,8 +223,16 @@ var styles = StyleSheet.create({
   },
   //Modal
   playerImageModal: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    width:screen.width,
+    height: screen.height,
+  },
+  modalImage:{
+    width:screen.width * 0.8,
+    // resizeMode: "contain",
     height: screen.height / 3,
-    resizeMode: "contain"
   },
   //playerContent
   playerContent: {

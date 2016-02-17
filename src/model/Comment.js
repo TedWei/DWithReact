@@ -1,4 +1,6 @@
 'use strict'
+var api = require("../components/api");
+var utils = require("../components/utils");
 class Comment{
 	constructor(shotId : ?Number,comment :?Object){
 		this.comment = comment;
@@ -15,6 +17,11 @@ class Comment{
 				return true;
 			}
 			return false;
+		})
+	}
+	getLikes():?Array{
+		return api.request(this.baseUrl+"/"+this.id+"/likes").then((responseData)=>{
+			return responseData
 		})
 	}
 	update(comment):?Boolean{
