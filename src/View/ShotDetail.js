@@ -40,7 +40,7 @@ var ShotDetails = React.createClass({
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
-      scale:new Animated.Value(1),
+      heartScale:new Animated.Value(1),
       liked:false,
       likes_count:this.props.shot.likes_count,
     };
@@ -59,7 +59,7 @@ var ShotDetails = React.createClass({
 
        this._scrollSpring.addListener({
          onSpringUpdate: () => {
-           this.setState({scale: this._scrollSpring.getCurrentValue()});
+           this.setState({heartScale: this._scrollSpring.getCurrentValue()});
          },
        });
 
@@ -81,17 +81,18 @@ var ShotDetails = React.createClass({
 
   componentDidMount: function() {
     this.checkLiked();
-    api.getResources(this.props.shot.comments_url).then((responseData) => {
+    var shot =new Shot(this.props.shot);
+    shot.getComment().then((responseData) => {
       this.setState({
         dataSource: this.state.dataSource.cloneWithRows(responseData),
         isLoading: false
       });
     }).done();
   },
-  _animated(){
-      this.state.scale.setValue(1.5);     // Start large
+  _animatedHeart(){
+      this.state.heartScale.setValue(1.5);     // Start large
       Animated.spring(                          // Base: spring, decay, timing
-        this.state.scale,                 // Animate `bounceValue`
+        this.state.heartScale,                 // Animate `bounceValue`
         {
           toValue: 1,                         // Animate to smaller size
           friction: 1,                          // Bouncier spring
@@ -137,25 +138,24 @@ var ShotDetails = React.createClass({
       likes_count:this.state.likes_count-1,
       liked:false,
     })
-    this._animated();
+    this._animatedHeart();
   },
   _renderLike(){
     this.setState({
       likes_count:this.state.likes_count+1,
       liked:true,
     })
-    this._animated();
+    this._animatedHeart();
   },
   render: function() {
     var player = this.props.shot.user,
         shot= this.props.shot;
     var heart = {
-    transform: [{scaleX: this.state.scale}, {scaleY: this.state.scale}],
-  }
+        transform: [{scaleX: this.state.heartScale}, {scaleY: this.state.heartScale}],
+    }
     return (
       <ParallaxView
         backgroundSource={getImage.shotImage(this.props.shot)}
-        windowHeight={300}
         header={(
           <TouchableOpacity onPress={this.openModal}>
             <View style={styles.invisibleView}></View>

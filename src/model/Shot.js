@@ -17,15 +17,10 @@ class Shot {
 		})
 	}
 	update(shot){
-		var tempBody ={
-			title:shot.title,
-			description:shot.description,
-			team_id:shot.team_id,
-			tags:shot.tags,
-		}
-		return api.request("shots/"+shot.id,{
+		temp=utils.extend({},shot);
+		return api.request("shots/"+this.id,{
 			method:"put",
-			body:api.parseToQuery(tempBody)
+			body:api.parseToQuery(temp)
 		}).then((responseData)=>{
 
 		})
@@ -66,6 +61,9 @@ class Shot {
 			}
 			return false;
 		})
+	}
+	getComment(){
+		return api.request("shots/"+this.id+"/comments").then((responseData) => responseData)
 	}
 }
 

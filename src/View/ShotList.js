@@ -179,7 +179,9 @@ var ShotList = React.createClass({
     this.props.navigator.push({
       component: ShotDetails,
       passProps: {shot},
-      title: shot.title
+      title: shot.title,
+      rightButtonTitle:'Edit',
+      onRightButtonPress:()=>this.props.navigator.pop(),
     });
   },
 

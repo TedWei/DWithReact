@@ -3,7 +3,7 @@
 module.exports = {
   shotImage: function(shot: Object): {uri: ?string} {
     var uri = shot.images.normal ? shot.images.normal : shot.images.teaser;
-    return {uri};
+    return {uri:uri};
   },
   authorAvatar: function(player: Object): {uri: ?string} {
     var uri;
@@ -11,8 +11,7 @@ module.exports = {
       uri = player.avatar_url;
       return {uri};
     } else {
-      // uri = require('../../img/AuthorAvatar.png');
-      uri ="base64:"
+      uri = require('../../img/AuthorAvatar.png');
       return uri;
     }
   }
