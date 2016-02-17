@@ -14,6 +14,7 @@ var api = require("../components/api");
 
 var ShotCell = require("./ShotCell"),
     ShotDetails = require("./ShotDetail"),
+    ShotDetailWithModal = require("./ShotDetailWithModal"),
     ShotFilter = require("./ShotFilter"),
     Player = require("./Player"),
     Loading = require("../components/Loading"),
@@ -46,7 +47,8 @@ var ShotList = React.createClass({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
       queryNumber: 0,
-      filters:["default","debuts","animated","rebounds","attachments","playoffs","teams"]
+      filters:["default","debuts","animated","rebounds","attachments","playoffs","teams"],
+      selectedShot:{},
     };
   },
 
@@ -182,15 +184,11 @@ var ShotList = React.createClass({
   },
 
   selectShot: function(shot: Object) {
-    this.props.navigator.push({
-      component: ShotDetails,
-      passProps: {shot},
-      title: shot.title,
-      rightButtonTitle:'Edit',
-      onRightButtonPress:()=>this.props.navigator.pop(),
-    });
+    this.setState({
+      selected:true,
+      selectedShot:shot,
+    })
   },
-
   renderFooter: function() {
     return <View style={styles.scrollSpinner}>
       <Loading />
@@ -212,6 +210,17 @@ var ShotList = React.createClass({
     })
     this.getShots(filter)
   },
+  _closeShotDetailModal(bool){
+    this.setState({
+      selected:false,
+      selectedShot:{},
+    })
+  },
+  _renderShotDetailModal(){
+    return (
+      <ShotDetailWithModal closeModal={this._closeShotDetailModal} shot={this.state.selectedShot} />
+      )
+  },
   render: function() {
     var content = this.state.dataSource.getRowCount() === 0 || this.state.isLoading ?
       <Loading/> :
@@ -231,6 +240,7 @@ var ShotList = React.createClass({
         <View style={styles.separator} />
         <ShotFilter updateFilter={this._handleFilter} style={styles.filter} filters={this.state.filters}/>
         {content}
+        {this.state.selected ? this._renderShotDetailModal() : null}
       </View>
     );
   },
