@@ -43,8 +43,22 @@ var Player = React.createClass({
   },
 
   componentDidMount:function(){
-    api.getResources(this.props.player.shots_url).then((responseData) => {
-      console.log(responseData)
+    if (!this.props.player){
+      api.getUser().then((responseData)=>{
+        this.setState({
+            player: responseData,
+          })
+        this._getShots(responseData.shots_url);
+      }).done()
+    }else{
+      this.setState({
+          player: this.props.player,
+        })
+      this._getShots(this.props.player.shots_url);
+    }
+  },
+  _getShots(url){
+    api.getResources(url).then((responseData) => {
       this.setState({
         dataSource: this.state.dataSource.cloneWithRows(responseData),
         isLoading: false
@@ -78,44 +92,43 @@ var Player = React.createClass({
      }
     return modal;
   },
-  render: function() {
+  _renderPlayer(){
     return (
-      <ParallaxView
-      windowHeight={260}
-      backgroundSource={getImage.authorAvatar(this.props.player)}
-      blur={"dark"}
-      >
       <View>
-        <TouchableOpacity onPress={this.openModal}>
           <View style={styles.headerContent}>
             <View style={styles.innerHeaderContent}>
-              <Image source={getImage.authorAvatar(this.props.player)}
+              <Image source={getImage.authorAvatar(this.state.player)}
               style={styles.playerAvatar} />
-              <Text style={styles.playerUsername}>{this.props.player.username}</Text>
-              <Text style={styles.playerName}>{this.props.player.name}</Text>
+              <Text style={styles.playerUsername}>{this.state.player.username}</Text>
+              <Text style={styles.playerName}>{this.state.player.name}</Text>
               <View style={styles.playerDetailsRow}>
                 <View style={styles.playerCounter}>
                   <Icon name="users" size={18} color="#fff"/>
-                  <Text style={styles.playerCounterValue}> {this.props.player.followers_count} </Text>
+                  <Text style={styles.playerCounterValue}> {this.state.player.followers_count} </Text>
                 </View>
                 <View style={styles.playerCounter}>
                   <Icon name="camera-retro" size={18} color="#fff"/>
-                  <Text style={styles.playerCounterValue}> {this.props.player.shots_count} </Text>
+                  <Text style={styles.playerCounterValue}> {this.state.player.shots_count} </Text>
                 </View>
                 <View style={styles.playerCounter}>
                   <Icon name="heart-o" size={18} color="#fff"/>
-                  <Text style={styles.playerCounterValue}> {this.props.player.likes_count} </Text>
+                  <Text style={styles.playerCounterValue}> {this.state.player.likes_count} </Text>
                 </View>
               </View>
             </View>
           </View>
-        </TouchableOpacity>
       </View>
+      )
+  },
+  render: function() {
+    return (
+      <View style={styles.container}>
+      {this.state.player ? this._renderPlayer() : <Loading />}
       <View style={styles.shotList}>
         {this.state.dataSource.length !== 0 ? this.renderShots() : <Loading />}
       </View>
         {this._renderModal()}
-      </ParallaxView>
+      </View>
     );
   },
 
@@ -149,11 +162,17 @@ var Player = React.createClass({
 });
 
 var styles = StyleSheet.create({
+  container:{
+    flex:1,
+    backgroundColor:"#ea4c89",
+    top:64,
+  },
   list:{
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
   shotList:{
+    marginTop:20,
     backgroundColor:"#ea4c89",
   },
   listStyle: {
@@ -228,6 +247,7 @@ var styles = StyleSheet.create({
     justifyContent: "center",
     width:screen.width,
     height: screen.height,
+    backgroundColor:"#ea4c89"
   },
   modalImage:{
     width:screen.width * 0.8,

@@ -34,7 +34,7 @@ var LOADING = {};
 var ShotList = React.createClass({
   getDefaultProps: function() {
     return {
-      filter: ""
+      filter: "default"
     };
   },
 
@@ -45,7 +45,6 @@ var ShotList = React.createClass({
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
-      filter: this.props.filter,
       queryNumber: 0,
       filters:["default","debuts","animated","rebounds","attachments","playoffs","teams"]
     };

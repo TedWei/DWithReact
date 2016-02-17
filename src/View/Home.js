@@ -8,6 +8,8 @@ import React,{
 } from 'react-native';
 
 var ShotList = require("./ShotList"),
+	Player = require("./Player"),
+	Test = require("./Test"),
 	Icon = require("react-native-vector-icons/FontAwesome"),
 	RCTDeviceEventEmitter = require("RCTDeviceEventEmitter");
 var Home= React.createClass({
@@ -17,14 +19,13 @@ var Home= React.createClass({
 			oldDate:'',
 		}
 	},
-	_renderContent: function(category: string, title: ?string) {
+	_renderContent: function(component: Object, title: ?string) {
 	  var passProps = {};
-	  passProps.filter=category;
 	  return (
-	    <NavigatorIOS ref="navigator" scroll={this.state.scrollToTop} style={styles.wrapper}
+	    <NavigatorIOS ref="navigator" style={styles.wrapper}
 	      initialRoute={{
-	        component: ShotList,
-	        title: "Shots",
+	        component: component,
+	        title: title,
 	        passProps: passProps
 	      }}
 	    />
@@ -58,28 +59,21 @@ var Home= React.createClass({
 	        <Icon.TabBarItem title="Shots" iconName="dribbble" selectedIconName="dribbble" selected={this.state.selectedTab === 'default'} onPress={()=>{
 	        	this._handlePress()
 	        }}  >
-	        {this._renderContent("default","Shots")}
+	        {this._renderContent(ShotList,"Shots")}
 	        </Icon.TabBarItem>
-	        <Icon.TabBarItem title="Debuts" iconName="trophy" selectedIconName="trophy" selected={this.state.selectedTab === 'debuts'} onPress={()=>{
+	        <Icon.TabBarItem title="Player" iconName="user" selectedIconName="user" selected={this.state.selectedTab === 'user'} onPress={()=>{
 	          this.setState({
-	            selectedTab:'debuts',
+	            selectedTab:'user',
 	          })
 	        }} >
-	        {this._renderContent("debuts","Debuts")}
+	        {this._renderContent(Player,"Player")}
 	        </Icon.TabBarItem>
-	        <Icon.TabBarItem title="Animated" iconName="heart" selectedIconName="heart" selected={this.state.selectedTab === 'animated'} onPress={()=>{
+	        <Icon.TabBarItem title="Test" iconName="user" selectedIconName="user" selected={this.state.selectedTab === 'Test'} onPress={()=>{
 	          this.setState({
-	            selectedTab:'animated',
+	            selectedTab:'Test',
 	          })
 	        }} >
-	        {this._renderContent("animated","Animated")}
-	        </Icon.TabBarItem>
-	        <Icon.TabBarItem title="Rebounds" iconName="lightbulb-o" selectedIconName="lightbulb-o" selected={this.state.selectedTab === 'rebounds'} onPress={()=>{
-	          this.setState({
-	            selectedTab:'rebounds',
-	          })
-	        }} >
-	        {this._renderContent("rebounds","Rebounds")}
+	        {this._renderContent(Test,"Test")}
 	        </Icon.TabBarItem>
 	    </TabBarIOS>
 	    )
