@@ -39,6 +39,9 @@ var Player = React.createClass({
   },
 
   componentWillMount: function() {
+  },
+
+  componentDidMount:function(){
     api.getResources(this.props.player.shots_url).then((responseData) => {
       this.setState({
         dataSource: this.state.dataSource.cloneWithRows(responseData),
@@ -46,7 +49,6 @@ var Player = React.createClass({
       });
     }).done();
   },
-
   openModal: function() {
     this.setState({
       isModalOpen: true
