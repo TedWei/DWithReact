@@ -13,6 +13,8 @@ var ShotFilter = React.createClass({
 			filter:this.props.selected
 		}
 	},
+	componentWillMount(){
+	},
 	_changeFilter(filter){
 		this.setState({
 			filter:filter

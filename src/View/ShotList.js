@@ -13,7 +13,7 @@ var {
 var api = require("../components/api");
 
 var ShotCell = require("./ShotCell"),
-    ShotDetails = require("./ShotDetail"),
+    ShotDetail = require("./ShotDetail"),
     ShotDetailWithModal = require("./ShotDetailWithModal"),
     ShotFilter = require("./ShotFilter"),
     Player = require("./Player"),
@@ -41,6 +41,7 @@ var ShotList = React.createClass({
 
   getInitialState: function() {
     return {
+      filter: "default",
       isLoading: false,
       isLoadingTail: false,
       dataSource: new ListView.DataSource({
@@ -185,9 +186,11 @@ var ShotList = React.createClass({
 
   selectShot: function(shot: Object) {
     this.setState({
-      selected:true,
+      // selected:true,
       selectedShot:shot,
     })
+    var modalContainer = this._renderShotDetailModal();
+    RCTDeviceEventEmitter.emit('showModal',modalContainer);
   },
   renderFooter: function() {
     return <View style={styles.scrollSpinner}>
@@ -211,14 +214,15 @@ var ShotList = React.createClass({
     this.getShots(filter)
   },
   _closeShotDetailModal(bool){
-    this.setState({
-      selected:false,
-      selectedShot:{},
-    })
+    RCTDeviceEventEmitter.emit('closeModal',modalContainer);
+    // this.setState({
+    //   selected:false,
+    //   selectedShot:{},
+    // })
   },
   _renderShotDetailModal(){
     return (
-      <ShotDetailWithModal closeModal={this._closeShotDetailModal} shot={this.state.selectedShot} />
+      <ShotDetail  shot={this.state.selectedShot} />
       )
   },
   render: function() {
@@ -238,9 +242,8 @@ var ShotList = React.createClass({
     return (
       <View style={styles.container}>
         <View style={styles.separator} />
-        <ShotFilter updateFilter={this._handleFilter} style={styles.filter} filters={this.state.filters}/>
+        <ShotFilter updateFilter={this._handleFilter} selected={this.state.filter} style={styles.filter} filters={this.state.filters}/>
         {content}
-        {this.state.selected ? this._renderShotDetailModal() : null}
       </View>
     );
   },
