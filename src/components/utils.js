@@ -52,6 +52,9 @@ var utils={
 			}
 		}
 		return encodeURI(tmp.join("&"))
+	},
+	abs:function(value){
+		return value >=0 ?  value : -value;
 	}
 };
 
