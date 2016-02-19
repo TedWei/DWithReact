@@ -36,7 +36,6 @@ var Player = require("./Player"),
 var ShotDetails = React.createClass({
   getInitialState: function() {
     return {
-      isModalOpen: false,
       isLoading: true,
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
@@ -47,20 +46,7 @@ var ShotDetails = React.createClass({
     };
   },
   componentWillMount(){
-    
   },
-  openModal: function() {
-    this.setState({
-      isModalOpen: true
-    });
-  },
-
-  closeModal: function() {
-    this.setState({
-      isModalOpen: false
-    });
-  },
-
   componentDidMount: function() {
     this.checkLiked();
     var shot =new Shot(this.props.shot);
@@ -143,47 +129,39 @@ var ShotDetails = React.createClass({
         transform: [{scaleX: this.state.heartScale}, {scaleY: this.state.heartScale}],
     }
     return (
-      <ParallaxView
-        backgroundSource={getImage.shotImage(this.props.shot)}
-        header={(
-          <TouchableOpacity onPress={this.openModal}>
-            <View style={styles.invisibleView}></View>
-          </TouchableOpacity>
-        )}
-        >
-        <View>
-          <TouchableHighlight style={styles.invisibleTouch}
-                              onPress={this.selectPlayer.bind(this, player)}
-                              underlayColor={"#333"}
-                              activeOpacity={0.95}>
-            <View style={styles.headerContent}>
+      <ScrollView
+        style={styles.scrollView}>
+        <View style={styles.container}>
+          <Image source={getImage.shotImage(this.props.shot)} style={styles.imageView} />
+          <View style={styles.headerContent}>
+              <View style={styles.avatarAndMore}>
               <Image source={getImage.authorAvatar(player)}
                      style={styles.playerAvatar} />
               <Text style={styles.shotTitle}>{this.props.shot.title}</Text>
               <Text style={styles.playerContent}>by <Text style={styles.player}>{player.name}</Text></Text>
-            </View>
-          </TouchableHighlight>
+              </View>
+              <View style={styles.shotDetailsRow}>
+                <View style={[styles.shotCounter]}>
+                <TouchableHighlight style={styles.invisibleTouch}
+                                onPress={this.like.bind(this,shot)}
+                                underlayColor={"#fff"}
+                                activeOpacity={0.95}>
+                  <Animated.View style={heart}><Icon name={this.state.liked ? "heart" : "heart-o"} size={16} color={this.state.liked ?"#ea4c89":"#333"}/></Animated.View>
+                  </TouchableHighlight>
+                  <Text style={styles.shotCounterText}> {this.state.likes_count} </Text>
+                </View>
+                <View style={styles.shotCounter}>
+                  <Icon name="comments-o" size={16} color="#333"/>
+                  <Text style={styles.shotCounterText}> {this.props.shot.comments_count} </Text>
+                </View>
+                <View style={styles.shotCounter}>
+                  <Icon name="eye" size={16} color="#333"/>
+                  <Text style={styles.shotCounterText}> {this.props.shot.views_count} </Text>
+                </View>
+              </View>
+          </View>
           <View style={styles.mainSection}>
-            <View style={styles.shotDetailsRow}>
-              <View style={[styles.shotCounter]}>
-              <TouchableHighlight style={styles.invisibleTouch}
-                              onPress={this.like.bind(this,shot)}
-                              underlayColor={"#fff"}
-                              activeOpacity={0.95}>
-                <Animated.View style={heart}><Icon name={this.state.liked ? "heart" : "heart-o"} size={24} color={this.state.liked ?"#ea4c89":"#333"}/></Animated.View>
-                </TouchableHighlight>
-                <Text style={styles.shotCounterText}> {this.state.likes_count} </Text>
-              </View>
-              <View style={styles.shotCounter}>
-                <Icon name="comments-o" size={24} color="#333"/>
-                <Text style={styles.shotCounterText}> {this.props.shot.comments_count} </Text>
-              </View>
-              <View style={styles.shotCounter}>
-                <Icon name="eye" size={24} color="#333"/>
-                <Text style={styles.shotCounterText}> {this.props.shot.views_count} </Text>
-              </View>
-            </View>
-            <View style={styles.separator} />
+          <View style={styles.separator} />
             <Text>
               <HTML value={this.props.shot.description}
                     stylesheet={styles}/>
@@ -195,13 +173,7 @@ var ShotDetails = React.createClass({
             </View>
           </View>
         </View>
-        <Modal visible={this.state.isModalOpen}
-          onDismiss={this.closeModal}>
-          <Image source={getImage.shotImage(this.props.shot)}
-                 style={styles.customModalImage}
-                 resizeMode="contain"/>
-        </Modal>
-      </ParallaxView>
+        </ScrollView>
     );
   },
 
@@ -233,11 +205,12 @@ var ShotDetails = React.createClass({
   },
 
   selectPlayer: function(player: Object) {
-    this.props.navigator.push({
-      component: Player,
-      passProps: {player},
-      title: player.name
-    });
+    console.log(player)
+    // this.props.navigator.push({
+    //   component: Player,
+    //   passProps: {player},
+    //   title: player.name
+    // });
   },
 
   _renderCommentsList: function() {
@@ -267,6 +240,12 @@ var ShotDetails = React.createClass({
 });
 
 var styles = StyleSheet.create({
+  container:{
+    flex:1,
+    backgroundColor:"#fff",
+    height:screen.height,
+    width:screen.width,
+  },
   spinner: {
     marginTop: 20,
     width: 50
@@ -279,6 +258,10 @@ var styles = StyleSheet.create({
     marginBottom: 0,
     flexDirection: "row",
     marginTop: 0,
+  },
+  imageView:{
+    width:screen.width,
+    height:screen.height/3,
   },
   invisibleView: {
     flex: 1,
@@ -293,11 +276,15 @@ var styles = StyleSheet.create({
   },
   headerContent: {
     flex: 1,
-    paddingBottom: 20,
-    paddingTop: 40,
-    alignItems: "center",
+    // alignItems: "center",
     width: screen.width,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
+    position:"relative",
+  },
+  avatarAndMore:{
+    // position:"absolute",
+    // bottom:-10,
+    left:30,
   },
   shotTitle: {
     fontSize: 16,
@@ -313,14 +300,13 @@ var styles = StyleSheet.create({
     lineHeight: 18
   },
   playerAvatar: {
-    borderRadius: 40,
-    width: 80,
-    height: 80,
-    position: "absolute",
-    bottom: 60,
-    left: screen.width / 2 - 40,
+    width: 40,
+    height: 40,
     borderWidth: 2,
-    borderColor: "#fff"
+    borderColor: "#fff",
+    marginTop:-20,
+    borderRadius: 20,
+    backgroundColor:"#fff"
   },
   rightPane: {
     flex: 1,
@@ -331,13 +317,18 @@ var styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "white",
-    flexDirection: "row"
+    flexDirection: "row",
+    width:screen.width/3,
+    position:"absolute",
+    // bottom:-10,
+    right:10,
+    top:10,
   },
   shotCounter: {
     flex: 2,
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    backgroundColor:"transparent"
   },
   shotCounterText: {
     color: "#333"

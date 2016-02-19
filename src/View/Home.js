@@ -112,20 +112,20 @@ var Home= React.createClass({
 	  	</View>
 	  	<Animated.View style={scale}>
 	  	<View style={this.state.isModalOpen ? [styles.container,styles.borderRidus]:[styles.container]}>
-	    <TabBarIOS tintColor={"#ea4c89"}>
-	        <Icon.TabBarItem title="Shots" iconName="dribbble" selectedIconName="dribbble" selected={this.state.selectedTab === 'default'} onPress={()=>{
+	    <TabBarIOS tintColor={"#333"} style={styles.tabbar}>
+	        <Icon.TabBarItem style={styles.tabbarItem} title="Shots" iconName="dribbble" selectedIconName="dribbble" selected={this.state.selectedTab === 'default'} onPress={()=>{
 	        	this._handlePress()
 	        }}  >
 	        {this._renderContent(ShotList,"Shots")}
 	        </Icon.TabBarItem>
-	        <Icon.TabBarItem title="Player" iconName="user" selectedIconName="user" selected={this.state.selectedTab === 'user'} onPress={()=>{
+	        <Icon.TabBarItem style={styles.tabbarItem} title="Player" iconName="user" selectedIconName="user" selected={this.state.selectedTab === 'user'} onPress={()=>{
 	          this.setState({
 	            selectedTab:'user',
 	          })
 	        }} >
 	        {this._renderContent(Player,"Player")}
 	        </Icon.TabBarItem>
-	        <Icon.TabBarItem title="Test" iconName="user" selectedIconName="user" selected={this.state.selectedTab === 'Test'} onPress={()=>{
+	        <Icon.TabBarItem style={styles.tabbarItem} title="Test" iconName="user" selectedIconName="user" selected={this.state.selectedTab === 'Test'} onPress={()=>{
 	          this.setState({
 	            selectedTab:'Test',
 	          })
@@ -148,6 +148,11 @@ const styles = StyleSheet.create({
   },
   rootView:{
   	flex:1,
+  },
+  tabbar:{
+  },
+  tabbarItem:{
+  	// opacity:0.9
   },
   blank:{
   	width:screen.width,

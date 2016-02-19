@@ -13,6 +13,7 @@ import React,{
 
 var getImage = require("../components/getImage"),
 	screen=Dimensions.get('window'),
+	Responder = require("../components/Responder"),
 	ShotDetailWithModal = require("./ShotDetailWithModal");
 const {BlurView,VibrancyView} = require("react-native-blur");
 
@@ -38,7 +39,6 @@ var Test = React.createClass({
        )
 	},
 	_selectRow(){
-		console.log("sdfd")
 		this.setState({
 			isModalOpen:true
 		})
@@ -78,15 +78,18 @@ var Test = React.createClass({
 	_renderModal(){
 		return (
 			<Modal transparent={true} visible={this.state.isModalOpen} animated={true} >
-			<TouchableOpacity onPress={this.closeModal}>
 			  <View style={styles.playerImageModal}>
 			  <BlurView blurType="light" style={styles.blur}>
 			  </BlurView>
-			  <View style={styles.modalContainer}>
-			  <Image source={getImage.authorAvatar()} />
-			  </View>
-			  </View>
+			  <TouchableOpacity onPress={this.closeModal}>
+			  <View style={styles.clickedView}></View>
 			  </TouchableOpacity>
+			  <Responder swiperLeft={this.closeModal} swiperRight={this.closeModal}>
+			  <View style={styles.modalContainer}>
+			  <Image style={styles.image} source={getImage.authorAvatar()} />
+			  </View>
+			  </Responder>
+			  </View>
 			</Modal>
 			)
 	},
@@ -144,6 +147,10 @@ var styles = StyleSheet.create({
       width:screen.width,
       height: screen.height,
     },
+    image:{
+    	width:screen.width,
+    	height:screen.height/3,
+    },
     modalContainer:{
     	flex: 1,
     	backgroundColor:"#fff",
@@ -151,7 +158,12 @@ var styles = StyleSheet.create({
     	height:screen.height-100,
     	top:100,
     	opacity:1
-    }
+    },
+    clickedView:{
+    	width:screen.width,
+    	height:100,
+    	position:"absolute",
+    },
 });
 
 module.exports = Test

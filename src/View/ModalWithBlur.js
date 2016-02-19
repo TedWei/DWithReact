@@ -13,6 +13,7 @@ import React,{
 
 var getImage = require("../components/getImage"),
 	screen=Dimensions.get('window'),
+	Responder = require("../components/Responder"),
 	ShotDetailWithModal = require("./ShotDetailWithModal");
 const {BlurView,VibrancyView} = require("react-native-blur");
 
@@ -26,27 +27,25 @@ var Test = React.createClass({
 		this.props.closeModal()
 		// this._cancelAnimatedHeart();
 	},
-	_renderModal(){
-		return (
-			<Modal transparent={true} visible={this.state.isModalOpen} animated={true} >
-			<TouchableOpacity onPress={this.closeModal}>
-			  <View style={styles.playerImageModal}>
-			  <BlurView blurType="dark" style={styles.blur}>
-			  </BlurView>
-			  <View style={styles.modalContainer}>
-			  {this.props.modalContainer}
-			  </View>
-			  </View>
-			  </TouchableOpacity>
-			</Modal>
-			)
-	},
 	render(){
 		return (
 			<View style={[styles.container,styles.blankView]}>
 			<View style={styles.container}>
 	        </View>
-			{this.state.isModalOpen ? this._renderModal():null}
+			<Modal transparent={true} visible={this.state.isModalOpen} animated={false} >
+			  <View style={styles.modalView}>
+			  <BlurView blurType="dark" style={styles.blur}>
+			  </BlurView>
+			  <TouchableOpacity onPress={this.closeModal}>
+			  <View style={styles.clickedView}></View>
+			  </TouchableOpacity>
+			  <View style={styles.modalContainer}>
+			  <Responder swiperLeft={this.closeModal} swiperRight={this.closeModal}>
+			  {this.props.modalContainer}
+			  </Responder>
+			  </View>
+			  </View>
+			</Modal>
 			</View>
 		)
 	}
@@ -60,6 +59,11 @@ var styles = StyleSheet.create({
 		flex:1,
 		width:screen.width,
 		height: screen.height,
+	},
+	clickedView:{
+		width:screen.width,
+		height: 100,
+		position:"absolute",
 	},
     list: {
         flexDirection: 'row',
@@ -82,13 +86,12 @@ var styles = StyleSheet.create({
     	position:"absolute",
     	opacity:0.8
     },
-    playerImageModal: {
+    modalView: {
       width:screen.width,
       height: screen.height,
     },
     modalContainer:{
     	flex: 1,
-    	backgroundColor:"#fff",
     	width:screen.width,
     	height:screen.height-100,
     	top:100,

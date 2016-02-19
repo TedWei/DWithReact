@@ -11,6 +11,7 @@ var TIMES = 400,
 	maxRotate = 45,
 	maxTranslatedY = 50,
 	maxProportion = 0.3,
+	delay=0,
 	screen = Dimensions.get("window"),
 	utils = require('./utils');
 
@@ -97,12 +98,14 @@ var ResponderView = React.createClass({
 	   	Animated.timing(this.state.translateX, {
 	   	  toValue: dx,
 	   	  ease:"linear",
+	   	  delay:delay,
 	   	}).start();
 	   	var proportion = dx/screen.width;
 	   	var value = -utils.abs(proportion)*maxTranslatedY;
 	   	Animated.timing(this.state.translateY, {
 	   	  toValue: value,
 	   	  ease:"linear",
+	   	  delay:delay,
 	   	}).start();
 	   },
 	   _rorate(dx){
@@ -110,20 +113,24 @@ var ResponderView = React.createClass({
 	   	Animated.timing(this.state.rotate, {
 	   	  toValue: value,
 	   	  ease:"linear",
+	   	  delay:delay,
 	   	}).start();
 	   },
 	   _animateBack(){
 	   	Animated.spring(this.state.rotate, {
 	   	  toValue: 0,
 	   	  ease:"linear",
+	   	  delay:delay,
 	   	}).start();
 	   	Animated.spring(this.state.translateX, {
 	   	  toValue: 0,
 	   	  ease:"linear",
+	   	  delay:delay,
 	   	}).start();
 	   	Animated.spring(this.state.translateY, {
 	   	  toValue: 0,
 	   	  ease:"linear",
+	   	  delay:delay,
 	   	}).start();
 	   },
 	  _swiperLeftEvent(){
