@@ -14,6 +14,7 @@ import React,{
 var getImage = require("../components/getImage"),
 	screen=Dimensions.get('window'),
 	Responder = require("../components/Responder"),
+	ModalWithAnimated = require("../components/Modal"),
 	ShotDetailWithModal = require("./ShotDetailWithModal");
 const {BlurView,VibrancyView} = require("react-native-blur");
 
@@ -26,6 +27,7 @@ var Test = React.createClass({
 	        selected:false,
 	        heartScale:new Animated.Value(1),
 	        isModalOpen:true,
+	        translateY:new Animated.Value(0),
 	      };
 	},
 	_renderRow(){
@@ -43,6 +45,7 @@ var Test = React.createClass({
 			isModalOpen:true
 		})
 		this._animatedHeart();
+		this._enter();
 	},
 	_closeRow(bool){
 		if (bool){
@@ -50,6 +53,16 @@ var Test = React.createClass({
 				selected:false
 			})
 		}
+	},
+	_enter(){
+	    this.state.translateY.setValue(screen.height);     // Start large
+	    Animated.spring(                          // Base: spring, decay, timing
+	      this.state.translateY,                 // Animate `bounceValue`
+	      {
+	        toValue: 0,                         // Animate to smaller size
+	        friction: 8
+	      }
+	    ).start();                                // Start the animation
 	},
 	_animatedHeart(){
 	    this.state.heartScale.setValue(1);     // Start large
@@ -76,21 +89,27 @@ var Test = React.createClass({
 		this._cancelAnimatedHeart();
 	},
 	_renderModal(){
+		var enter = {
+			transform:[{translateY:this.state.translateY}]
+		}
 		return (
-			<Modal transparent={true} visible={this.state.isModalOpen} animated={true} >
-			  <View style={styles.playerImageModal}>
-			  <BlurView blurType="light" style={styles.blur}>
+			<View style={[styles.container,styles.blankView]}>
+			  <View style={styles.modalView}>
+			  <BlurView blurType="dark" style={styles.blur}>
 			  </BlurView>
 			  <TouchableOpacity onPress={this.closeModal}>
 			  <View style={styles.clickedView}></View>
 			  </TouchableOpacity>
-			  <Responder swiperLeft={this.closeModal} swiperRight={this.closeModal}>
-			  <View style={styles.modalContainer}>
+			  <Responder  swiperLeft={this.closeModal} swiperRight={this.closeModal}>
+			  <ModalWithAnimated.Modal>
 			  <Image style={styles.image} source={getImage.authorAvatar()} />
-			  </View>
+			  </ModalWithAnimated.Modal>
+			  <ModalWithAnimated.Tips>
+			     <Text>{"FBI warning"}</Text>
+			  </ModalWithAnimated.Tips>
 			  </Responder>
 			  </View>
-			</Modal>
+			</View>
 			)
 	},
 	render(){
@@ -114,56 +133,67 @@ var Test = React.createClass({
 })
 
 var styles = StyleSheet.create({
-	blankView:{
-		backgroundColor:"#000"
-	},
-	container:{
-		flex:1,
-		width:screen.width,
-		height: screen.height,
-	},
-    list: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-    },
-    item: {
-        backgroundColor: 'red',
-        margin: 3,
-        width: 100
-    },
-    cellImage: {
-      height: 300,
-      width: screen.width,
-      backgroundColor: "transparent",
-      resizeMode: "cover"
-    },
-    blur:{
-    	width:screen.width,
-    	height: screen.height,
-    	position:"absolute",
-    	opacity:0.8
-    },
-    playerImageModal: {
-      width:screen.width,
-      height: screen.height,
-    },
-    image:{
-    	width:screen.width,
-    	height:screen.height/3,
-    },
-    modalContainer:{
-    	flex: 1,
-    	backgroundColor:"#fff",
-    	width:screen.width,
-    	height:screen.height-100,
-    	top:100,
-    	opacity:1
-    },
-    clickedView:{
-    	width:screen.width,
-    	height:100,
-    	position:"absolute",
-    },
+
+    	blankView:{
+    		backgroundColor: "transparent",
+    	},
+    	container:{
+    		flex:1,
+    		width:screen.width,
+    		height: screen.height,
+    		position:"absolute",
+    		backgroundColor:"transparent",
+    		left:0,
+    		top:0,
+    	},
+    	clickedView:{
+    		width:screen.width,
+    		height: 100,
+    		position:"absolute",
+    		top:0,
+    	},
+        list: {
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+        },
+        item: {
+            backgroundColor: 'red',
+            margin: 3,
+            width: 100
+        },
+        cellImage: {
+          height: 300,
+          width: screen.width,
+          backgroundColor: "transparent",
+          resizeMode: "cover"
+        },
+        blur:{
+        	width:screen.width,
+        	height: screen.height,
+        	position:"absolute",
+        	opacity:0.8
+        },
+        modalView: {
+          width:screen.width,
+          height: screen.height,
+          position:"relative",
+          backgroundColor:"transparent",
+        },
+        ImageView:{
+        	width:screen.width,
+        	height:screen.height-100,
+        	backgroundColor:"#fff",
+        	top:100,
+        },
+        modalContainer:{
+        	flex: 1,
+        	width:screen.width,
+        	height:screen.height-100,
+        	backgroundColor:"#fff",
+        	opacity:1,
+        	top:100,
+        	position:"absolute",
+        }
 });
 
 module.exports = Test

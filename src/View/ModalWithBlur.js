@@ -30,22 +30,18 @@ var Test = React.createClass({
 	render(){
 		return (
 			<View style={[styles.container,styles.blankView]}>
-			<View style={styles.container}>
-	        </View>
-			<Modal transparent={true} visible={this.state.isModalOpen} animated={false} >
 			  <View style={styles.modalView}>
 			  <BlurView blurType="dark" style={styles.blur}>
 			  </BlurView>
 			  <TouchableOpacity onPress={this.closeModal}>
 			  <View style={styles.clickedView}></View>
 			  </TouchableOpacity>
-			  <View style={styles.modalContainer}>
+			  <Modal style={styles.modalContainer} visible={this.state.isModalOpen} animated={true}>
 			  <Responder swiperLeft={this.closeModal} swiperRight={this.closeModal}>
 			  {this.props.modalContainer}
 			  </Responder>
+			  </Modal>
 			  </View>
-			  </View>
-			</Modal>
 			</View>
 		)
 	}
@@ -53,12 +49,15 @@ var Test = React.createClass({
 
 var styles = StyleSheet.create({
 	blankView:{
-		backgroundColor:"#000"
+		backgroundColor: "transparent",
 	},
 	container:{
 		flex:1,
 		width:screen.width,
 		height: screen.height,
+		position:"absolute",
+		left:0,
+		top:0,
 	},
 	clickedView:{
 		width:screen.width,
@@ -95,7 +94,9 @@ var styles = StyleSheet.create({
     	width:screen.width,
     	height:screen.height-100,
     	top:100,
-    	opacity:1
+    	opacity:1,
+    	backgroundColor:"transparent",
+    	overflow:"hidden",
     }
 });
 

@@ -27,6 +27,7 @@ function fetchData(URL,setting) {
     };
     var setting = utils.extend(defaultSetting,setting);
     return fetch(URL,setting).then((responseData) => {
+        console.log(responseData)
         if (responseData.status ==200 || responseData.status ==201){
             return responseData.json();
         }else{

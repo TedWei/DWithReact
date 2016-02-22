@@ -7,12 +7,9 @@ import React,{
 	Dimensions,
 } from 'react-native'
 
-var TIMES = 400,
-	maxRotate = 45,
-	maxTranslatedY = 50,
-	maxProportion = 0.3,
-	delay=0,
+var SWIPE_THRESHOLD = 120,
 	screen = Dimensions.get("window"),
+	clamp = require('clamp')
 	utils = require('./utils');
 
 var ResponderView = React.createClass({
@@ -20,24 +17,51 @@ var ResponderView = React.createClass({
 	_position:{},
 	getInitialState(){
 		return {
+			pan:new Animated.ValueXY(),
 			translateX:new Animated.Value(0),
 			translateY:new Animated.Value(0),
 			rotate:new Animated.Value(0),
 		};
 	},
 	componentWillMount: function() {
+
 	   this._panResponder = PanResponder.create({
 	     onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
 	     onMoveShouldSetPanResponder: this._handleMoveShouldSetPanResponder,
-	     onPanResponderGrant: this._handlePanResponderGrant,
-	     onPanResponderMove: this._handlePanResponderMove,
-	     onPanResponderRelease: this._handlePanResponderEnd,
-	     onPanResponderTerminate: this._handlePanResponderEnd,
-	   });
+	     onPanResponderGrant:(e)=>{
+	     	this.state.pan.setOffset({x: this.state.pan.x._value, y: this.state.pan.y._value});
+	     	this.state.pan.setValue({x: 0, y: 0});
+
+	     },
+	    onPanResponderMove: Animated.event([
+        null, {dx: this.state.pan.x, dy: this.state.pan.y},
+      	]),
+	     onPanResponderRelease: (e, {vx, vy}) => {
+        this.state.pan.flattenOffset();
+        var velocity;
+
+        if (vx >= 0) {
+          velocity = clamp(vx, 3, 5);
+        } else if (vx < 0) {
+          velocity = clamp(vx * -1, 3, 5) * -1;
+        }
+
+        if (Math.abs(this.state.pan.x._value) > SWIPE_THRESHOLD) {
+         var event =  velocity < 0 ?this._swiperLeftEvent:this._swiperRightEvent
+          Animated.decay(this.state.pan, {
+            velocity: {x: velocity, y: vy},
+            deceleration: 0.98
+          }).start(event)
+        } else {
+          Animated.spring(this.state.pan, {
+            toValue: {x: 0, y: 0},
+            friction: 4
+          }).start()
+        }
+      }});
 	 },
 
 	 componentDidMount: function() {
-	   // this._animate();
 	 },
 
 	 _handlePan(evt){
@@ -46,11 +70,12 @@ var ResponderView = React.createClass({
 
 	 },
 	 render: function() {
+	 	let { pan, enter, } = this.state;
+	 	let [translateX, translateY] = [pan.x, pan.y];
+	 	let rotate = pan.x.interpolate({inputRange: [-200, 0, 200], outputRange: ["-30deg", "0deg", "30deg"]});
 	 	var scale = {
-	 	    transform: [{translateX:this.state.translateX},{translateY:this.state.translateY},{rotate:this.state.rotate.interpolate({
-	 	    	inputRange:[-360,360],
-	 	    	outputRange:['-360deg','360deg']
-	 	    })}],
+	 	    transform: [{translateX},{translateY},{rotate}],
+	 	    backgroundColor:"transparent"
 	 	}
 	   return (
 	     <View
@@ -63,18 +88,13 @@ var ResponderView = React.createClass({
 	   );
 	 },
 	 _handleStartShouldSetPanResponder: function(e: Object, gestureState: Object): boolean {
-	    // Should we become active when the user presses down on the circle?
 	    return true;
 	  },
 
 	  _handleMoveShouldSetPanResponder: function(e: Object, gestureState: Object): boolean {
-	    // Should we become active when the user moves a touch over the circle?
 	    return true;
 	  },
 	  _handlePanEnd(ges){
-	  	if (ges.moveX === 0 && ges.moveY === 0 ){
-	  		this._clickEvent();
-	  	}
 	  	var proportion = ges.dx/screen.width;
 	  	if (proportion > maxProportion){
 	  		this._swiperLeftEvent();
@@ -84,38 +104,6 @@ var ResponderView = React.createClass({
 	  		this._animateBack();
 	  	}
 	  },
-	  _handleSwiper(ges){
-	  	this._animate(ges.dx);
-	  },
-	  _clickEvent(){
-	  	console.log("clicked");
-	  },
-	  _animate(dx) {
-	  	this._translate(dx);
-	  	this._rorate(dx);
-	   },
-	   _translate(dx){
-	   	Animated.timing(this.state.translateX, {
-	   	  toValue: dx,
-	   	  ease:"linear",
-	   	  delay:delay,
-	   	}).start();
-	   	var proportion = dx/screen.width;
-	   	var value = -utils.abs(proportion)*maxTranslatedY;
-	   	Animated.timing(this.state.translateY, {
-	   	  toValue: value,
-	   	  ease:"linear",
-	   	  delay:delay,
-	   	}).start();
-	   },
-	   _rorate(dx){
-	   	var value = (dx/screen.width)*maxRotate;
-	   	Animated.timing(this.state.rotate, {
-	   	  toValue: value,
-	   	  ease:"linear",
-	   	  delay:delay,
-	   	}).start();
-	   },
 	   _animateBack(){
 	   	Animated.spring(this.state.rotate, {
 	   	  toValue: 0,
@@ -139,13 +127,9 @@ var ResponderView = React.createClass({
 	  _swiperRightEvent(){
 	  	this.props.swiperRight();
 	  },
-	  _updatePosition(gestureState){
-
-	  },
 	  _handlePanResponderGrant: function(e: Object, gestureState: Object) {
-	  },
-	  _handlePanResponderMove: function(e: Object, gestureState: Object) {
-	    this._handleSwiper(gestureState)
+	  	this.state.pan.setOffset({x: this.state.pan.x._value, y: this.state.pan.y._value});
+	  	this.state.pan.setValue({x: 0, y: 0});
 	  },
 	  _handlePanResponderEnd: function(e: Object, gestureState: Object) {
 	  	this._handlePanEnd(gestureState)
@@ -155,6 +139,7 @@ var ResponderView = React.createClass({
 var styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:"transparent"
   },
 });
 
