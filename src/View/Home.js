@@ -100,7 +100,7 @@ var Home= React.createClass({
 	    ).start();                                // Start the animation
 	},
 	_renderModal(){
-		return <ModalWithBlur closeModal={this._closeModal} modalContainer={this.state.modalContainer} />
+		return (<ModalWithBlur closeModal={this._closeModal} modalContainer={this.state.modalContainer} />)
 	},
 	render(){
 		var scale = {

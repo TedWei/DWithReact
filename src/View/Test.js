@@ -13,6 +13,7 @@ import React,{
 
 var getImage = require("../components/getImage"),
 	screen=Dimensions.get('window'),
+	ModalWithBlur = require("./ModalWithBlur"),
 	Responder = require("../components/Responder"),
 	ModalWithAnimated = require("../components/Modal"),
 	ShotDetailWithModal = require("./ShotDetailWithModal");
@@ -82,7 +83,7 @@ var Test = React.createClass({
 	      }
 	    ).start();                                // Start the animation
 	},
-	closeModal(){
+	_closeModal(){
 		this.setState({
 			isModalOpen:false
 		})
@@ -92,23 +93,12 @@ var Test = React.createClass({
 		var enter = {
 			transform:[{translateY:this.state.translateY}]
 		}
-		return (
-			<View style={[styles.container,styles.blankView]}>
-			  <View style={styles.modalView}>
-			  <BlurView blurType="dark" style={styles.blur}>
-			  </BlurView>
-			  <TouchableOpacity onPress={this.closeModal}>
-			  <View style={styles.clickedView}></View>
-			  </TouchableOpacity>
-			  <Responder  swiperLeft={this.closeModal} swiperRight={this.closeModal}>
-			  <ModalWithAnimated.Modal>
-			  <Image style={styles.image} source={getImage.authorAvatar()} />
-			  </ModalWithAnimated.Modal>
-			  <ModalWithAnimated.Tips>
-			     <Text>{"FBI warning"}</Text>
-			  </ModalWithAnimated.Tips>
-			  </Responder>
-			  </View>
+		return ( 
+			<View>
+			<ModalWithBlur style={{top:100}} closeModal={this._closeModal} modalContainer={<Image style={styles.image} source={getImage.authorAvatar()} />} />
+			<ModalWithAnimated.Tips >
+			<Text style={styles.tips}>{"xhangdf"}</Text>
+			</ModalWithAnimated.Tips>
 			</View>
 			)
 	},
@@ -179,11 +169,21 @@ var styles = StyleSheet.create({
           position:"relative",
           backgroundColor:"transparent",
         },
+        image:{
+        	width:screen.width,
+        	height:screen.height/3,
+        },
         ImageView:{
         	width:screen.width,
         	height:screen.height-100,
         	backgroundColor:"#fff",
         	top:100,
+        },
+        tips:{
+        	alignItems:"center",
+        	color:"#fff",
+        	textAlign:"center"
+
         },
         modalContainer:{
         	flex: 1,

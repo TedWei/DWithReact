@@ -13,7 +13,7 @@ class ModalWithAnimated extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
-		 	translateY:new Animated.Value(0)
+		 	translateY:new Animated.Value(0),
 		}
 	}
 	componentDidMount(){
@@ -34,7 +34,9 @@ class ModalWithAnimated extends Component {
 			transform:[{translateY:this.state.translateY}]
 		}
 		return (
-			<Animated.View style={[styles.container,enter,this.props.style]} />
+			<Animated.View style={[styles.container,enter]} >
+			<View {...this.props} />
+			</Animated.View>
 			)
 	}
 }
@@ -45,7 +47,7 @@ class Tips extends ModalWithAnimated {
 	constructor(props){
 		super(props);
 		this.state = {
-		 	translateY:new Animated.Value(0)
+		 	translateY:new Animated.Value(0),
 		}
 	}
 	componentDidMount(){
@@ -75,7 +77,9 @@ class Tips extends ModalWithAnimated {
 			transform:[{translateY:this.state.translateY}]
 		}
 		return (
-			<ModalWithAnimated style={[styles.tips,enter,this.props.style]} />
+			<Animated.View style={[styles.tips,enter,this.props.style]} >
+			<View {...this.props} />
+			</Animated.View>
 			)
 	}
 }
@@ -85,11 +89,7 @@ class Tips extends ModalWithAnimated {
 
 const styles = StyleSheet.create({
 	container:{
-		flex:1,
-		width:screen.width,
-		height:screen.height-100,
 		backgroundColor:"#fff",
-		top:100,
 	},
 	tips:{
 		flex:1,
@@ -99,10 +99,6 @@ const styles = StyleSheet.create({
 		position:"absolute",
 		backgroundColor:"#ea4c89",
 	},
-	text:{
-		alignItems:"center",
-		color:"#fff"
-	}
 })
 
 module.exports = {

@@ -8,11 +8,12 @@ import React,{
 } from 'react-native'
 
 var SWIPE_THRESHOLD = 120,
+    edge =40,
 	screen = Dimensions.get("window"),
 	clamp = require('clamp')
 	utils = require('./utils');
 
-var ResponderView = React.createClass({
+var Responder = React.createClass({
 	_panResponder:{},
 	_position:{},
 	getInitialState(){
@@ -25,18 +26,28 @@ var ResponderView = React.createClass({
 	},
 	componentWillMount: function() {
 
+		function checkIfVerticalMove(ges){
+			if(Math.abs(ges.dx) < edge ){
+				return true;
+			}
+			return false;
+		}
+
 	   this._panResponder = PanResponder.create({
 	     onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
 	     onMoveShouldSetPanResponder: this._handleMoveShouldSetPanResponder,
-	     onPanResponderGrant:(e)=>{
+	     onPanResponderGrant:(e,gestureState)=>{
+	     	console.log(gestureState)
 	     	this.state.pan.setOffset({x: this.state.pan.x._value, y: this.state.pan.y._value});
 	     	this.state.pan.setValue({x: 0, y: 0});
 
 	     },
-	    onPanResponderMove: Animated.event([
-        null, {dx: this.state.pan.x, dy: this.state.pan.y},
-      	]),
-	     onPanResponderRelease: (e, {vx, vy}) => {
+	    onPanResponderMove:(event, gestureState) => {
+	    	if (gestureState.x0 < edge || gestureState.x0 > screen.width-edge && !checkIfVerticalMove(gestureState)){
+	    	this.state.pan.setValue({x: gestureState.dx, y: gestureState.dy});
+	    	}
+	    },
+	    onPanResponderRelease: (e, {vx, vy}) => {
         this.state.pan.flattenOffset();
         var velocity;
 
@@ -59,80 +70,33 @@ var ResponderView = React.createClass({
           }).start()
         }
       }});
-	 },
-
-	 componentDidMount: function() {
-	 },
-
-	 _handlePan(evt){
-	 },
-	 _updatePosition(){
-
+	   console.log(this._panResponder)
 	 },
 	 render: function() {
 	 	let { pan, enter, } = this.state;
 	 	let [translateX, translateY] = [pan.x, pan.y];
 	 	let rotate = pan.x.interpolate({inputRange: [-200, 0, 200], outputRange: ["-30deg", "0deg", "30deg"]});
 	 	var scale = {
-	 	    transform: [{translateX},{translateY},{rotate}],
+	 	    transform: [{translateX},{rotate}],
 	 	    backgroundColor:"transparent"
 	 	}
 	   return (
-	     <View
-	       style={styles.container}>
 	       <Animated.View style={scale} ref="animated">
-	       		<View {...this.props} {...this._panResponder.panHandlers}
-	       />
+	       		<View  {...this.props} {...this._panResponder.panHandlers} />
 	       </Animated.View>
-	     </View>
 	   );
 	 },
 	 _handleStartShouldSetPanResponder: function(e: Object, gestureState: Object): boolean {
 	    return true;
 	  },
-
 	  _handleMoveShouldSetPanResponder: function(e: Object, gestureState: Object): boolean {
 	    return true;
 	  },
-	  _handlePanEnd(ges){
-	  	var proportion = ges.dx/screen.width;
-	  	if (proportion > maxProportion){
-	  		this._swiperLeftEvent();
-	  	}else if(proportion< -maxProportion){
-	  		this._swiperRightEvent();
-	  	}else{
-	  		this._animateBack();
-	  	}
-	  },
-	   _animateBack(){
-	   	Animated.spring(this.state.rotate, {
-	   	  toValue: 0,
-	   	  ease:"linear",
-	   	  delay:delay,
-	   	}).start();
-	   	Animated.spring(this.state.translateX, {
-	   	  toValue: 0,
-	   	  ease:"linear",
-	   	  delay:delay,
-	   	}).start();
-	   	Animated.spring(this.state.translateY, {
-	   	  toValue: 0,
-	   	  ease:"linear",
-	   	  delay:delay,
-	   	}).start();
-	   },
 	  _swiperLeftEvent(){
 	  	this.props.swiperLeft();
 	  },
 	  _swiperRightEvent(){
 	  	this.props.swiperRight();
-	  },
-	  _handlePanResponderGrant: function(e: Object, gestureState: Object) {
-	  	this.state.pan.setOffset({x: this.state.pan.x._value, y: this.state.pan.y._value});
-	  	this.state.pan.setValue({x: 0, y: 0});
-	  },
-	  _handlePanResponderEnd: function(e: Object, gestureState: Object) {
-	  	this._handlePanEnd(gestureState)
 	  },
 })
 
@@ -143,4 +107,4 @@ var styles = StyleSheet.create({
   },
 });
 
-module.exports = ResponderView
+module.exports = Responder

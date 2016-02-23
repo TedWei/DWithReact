@@ -14,6 +14,7 @@ import React,{
 var getImage = require("../components/getImage"),
 	screen=Dimensions.get('window'),
 	Responder = require("../components/Responder"),
+	ModalWithAnimated = require("../components/Modal"),
 	ShotDetailWithModal = require("./ShotDetailWithModal");
 const {BlurView,VibrancyView} = require("react-native-blur");
 
@@ -25,7 +26,6 @@ var Test = React.createClass({
 	},
 	closeModal(){
 		this.props.closeModal()
-		// this._cancelAnimatedHeart();
 	},
 	render(){
 		return (
@@ -36,11 +36,13 @@ var Test = React.createClass({
 			  <TouchableOpacity onPress={this.closeModal}>
 			  <View style={styles.clickedView}></View>
 			  </TouchableOpacity>
-			  <Modal style={styles.modalContainer} visible={this.state.isModalOpen} animated={true}>
+			  <View style={styles.responder} >
 			  <Responder swiperLeft={this.closeModal} swiperRight={this.closeModal}>
+			  <ModalWithAnimated.Modal style={styles.modalContainer}>
 			  {this.props.modalContainer}
+			  </ModalWithAnimated.Modal>
 			  </Responder>
-			  </Modal>
+			  </View>
 			  </View>
 			</View>
 		)
@@ -61,8 +63,9 @@ var styles = StyleSheet.create({
 	},
 	clickedView:{
 		width:screen.width,
-		height: 100,
+		height: screen.height,
 		position:"absolute",
+		top:0,
 	},
     list: {
         flexDirection: 'row',
@@ -89,14 +92,21 @@ var styles = StyleSheet.create({
       width:screen.width,
       height: screen.height,
     },
-    modalContainer:{
+    responder:{
     	flex: 1,
     	width:screen.width,
     	height:screen.height-100,
     	top:100,
+    	position:"absolute",
     	opacity:1,
-    	backgroundColor:"transparent",
+    	backgroundColor:"#transparent",
     	overflow:"hidden",
+    },
+    modalContainer:{
+    	flex: 1,
+    	width:screen.width,
+    	height:screen.height-100,
+    	backgroundColor:"#fff",
     }
 });
 
