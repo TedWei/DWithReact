@@ -135,7 +135,6 @@ var ShotList = React.createClass({
   onEndReached: function() {
     var query = this.state.filter;
     if (!this.hasMore() || this.state.isLoadingTail) {
-      // We"re already fetching or have all the elements so noop
       return;
     }
 

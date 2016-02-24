@@ -7,12 +7,14 @@ import React,{
 	TouchableWithoutFeedback,
 	Animated,
 	Dimensions,
+	Text,
 	View,
 } from 'react-native';
 
 var ShotList = require("./ShotList"),
 	Player = require("./Player"),
 	Test = require("./Test"),
+	ModalWithAnimated = require("../components/Modal"),
 	ModalWithBlur = require("./ModalWithBlur"),
 	Icon = require("react-native-vector-icons/FontAwesome"),
 	screen = Dimensions.get("window"),
@@ -22,6 +24,7 @@ var Home= React.createClass({
 		return {
 			selectedTab:'default',
 			oldDate:'',
+			notification:{},
 			viewScale:new Animated.Value(1)
 		}
 	},
@@ -39,12 +42,8 @@ var Home= React.createClass({
 	},
 	componentDidMount(){
 		var _that =this;
-		RCTDeviceEventEmitter.addListener('showModal',function(modal){
-		  _that._showModal(modal)
-		})
-		RCTDeviceEventEmitter.addListener('closeModal',function(modal){
-		  _that._closeModal(modal)
-		})
+		this._hanldeModal();
+		this._hanndleNotification();
 	},
 	_handlePress(){
 		var newDate = Date.now();
@@ -68,6 +67,27 @@ var Home= React.createClass({
 			})
 		}
 	},
+	_hanldeModal(){
+		var _that =this;
+		RCTDeviceEventEmitter.addListener('showModal',function(modal){
+		  _that._showModal(modal)
+		})
+		RCTDeviceEventEmitter.addListener('closeModal',function(modal){
+		  _that._closeModal(modal)
+		})
+	},
+	_hanndleNotification(){
+		var _that =this;
+		RCTDeviceEventEmitter.addListener('notification',function(notification){
+		  	_that.setState({
+		  		notification:{
+		  			category:notification.category,
+		  			content:notification.content,
+		  		}
+		  	})
+		})
+		RCTDeviceEventEmitter.emit('notification',{category:"tips",content:"zhangsan"});
+	},
 	_showModal(modal){
 		this.setState({
 			modalContainer:modal,
@@ -82,25 +102,33 @@ var Home= React.createClass({
 		this._cancelAnimatedView();
 	},
 	_animatedView(){
-	    this.state.viewScale.setValue(1);     // Start large
-	    Animated.spring(                          // Base: spring, decay, timing
-	      this.state.viewScale,                 // Animate `bounceValue`
+	    this.state.viewScale.setValue(1);
+	    Animated.spring(
+	      this.state.viewScale,
 	      {
-	        toValue: 0.95,                         // Animate to smaller size
+	        toValue: 0.95,
 	      }
-	    ).start();                                // Start the animation
+	    ).start();
 	},
 	_cancelAnimatedView(){
-	    this.state.viewScale.setValue(0.95);     // Start large
-	    Animated.spring(                          // Base: spring, decay, timing
-	      this.state.viewScale,                 // Animate `bounceValue`
+	    this.state.viewScale.setValue(0.95);
+	    Animated.spring(
+	      this.state.viewScale,
 	      {
-	        toValue: 1,                         // Animate to smaller size
+	        toValue: 1,
 	      }
-	    ).start();                                // Start the animation
+	    ).start();
 	},
 	_renderModal(){
 		return (<ModalWithBlur closeModal={this._closeModal} modalContainer={this.state.modalContainer} />)
+	},
+	_closeTips(){
+		this.setState({
+			notification:{},
+		})
+	},
+	_renderNotification(){
+		return (<ModalWithAnimated.Tips callback={this._closeTips}><Text style={styles.tips}>{this.state.notification.content}</Text></ModalWithAnimated.Tips>)
 	},
 	render(){
 		var scale = {
@@ -136,6 +164,7 @@ var Home= React.createClass({
 	    </View>
 	    </Animated.View>
 	    {this.state.isModalOpen ? this._renderModal():null}
+	    {this.state.notification.category ? this._renderNotification():null}
 	    </View>
 	    )
 	}

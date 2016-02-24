@@ -58,7 +58,7 @@ class Tips extends ModalWithAnimated {
 	    Animated.spring(
 	      this.state.translateY,
 	      {
-	        toValue: screen.height/2,
+	        toValue: 0,
 	        friction: 10
 	      }
 	    ).start(this._hideView.bind(this));
@@ -70,7 +70,10 @@ class Tips extends ModalWithAnimated {
 		    toValue: -64,
 		    friction: 10
 		  }
-		).start();
+		).start(this._setCallback.bind(this));
+	}
+	_setCallback(){
+		this.props.callback();
 	}
 	render(){
 		var enter = {

@@ -37,7 +37,6 @@ var Responder = React.createClass({
 	     onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
 	     onMoveShouldSetPanResponder: this._handleMoveShouldSetPanResponder,
 	     onPanResponderGrant:(e,gestureState)=>{
-	     	console.log(gestureState)
 	     	this.state.pan.setOffset({x: this.state.pan.x._value, y: this.state.pan.y._value});
 	     	this.state.pan.setValue({x: 0, y: 0});
 
@@ -70,7 +69,6 @@ var Responder = React.createClass({
           }).start()
         }
       }});
-	   console.log(this._panResponder)
 	 },
 	 render: function() {
 	 	let { pan, enter, } = this.state;
