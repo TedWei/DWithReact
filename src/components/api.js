@@ -1,8 +1,10 @@
 'use strict';
 
 import React,{
-    AsyncStorage
+    AsyncStorage,
 } from 'react-native';
+
+import RCTDeviceEventEmitter from "RCTDeviceEventEmitter";
 
 var API_URL = "https://api.dribbble.com/v1/",
     ACCESS_TOKEN = "",
@@ -28,8 +30,10 @@ function fetchData(URL,setting) {
     var setting = utils.extend(defaultSetting,setting);
     return fetch(URL,setting).then((responseData) => {
         console.log(responseData)
-        if (responseData.status ==200 || responseData.status ==201){
+        if (responseData.status ===200 || responseData.status ===201){
             return responseData.json();
+        }else if (responseData.status === 0){
+            RCTDeviceEventEmitter.emit('notification',{category:"tips",content:JSON.stringify(responseData)});
         }else{
             return responseData;
         }

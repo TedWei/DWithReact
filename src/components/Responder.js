@@ -36,10 +36,15 @@ var Responder = React.createClass({
 	   this._panResponder = PanResponder.create({
 	     onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
 	     onMoveShouldSetPanResponder: this._handleMoveShouldSetPanResponder,
+	     onPanResponderTerminationRequest:()=>true,
+	     onMoveShouldSetPanResponderCapture:this._handleMoveShouldSetPanResponderCapture,
 	     onPanResponderGrant:(e,gestureState)=>{
-	     	this.state.pan.setOffset({x: this.state.pan.x._value, y: this.state.pan.y._value});
-	     	this.state.pan.setValue({x: 0, y: 0});
-
+	     	if (gestureState.x0 < edge || gestureState.x0 > screen.width-edge && !checkIfVerticalMove(gestureState)){
+	     		this.state.pan.setOffset({x: this.state.pan.x._value, y: this.state.pan.y._value});
+	     		this.state.pan.setValue({x: 0, y: 0});
+	 		return true;
+	 		}
+		     return false;
 	     },
 	    onPanResponderMove:(event, gestureState) => {
 	    	if (gestureState.x0 < edge || gestureState.x0 > screen.width-edge && !checkIfVerticalMove(gestureState)){
@@ -79,16 +84,28 @@ var Responder = React.createClass({
 	 	    backgroundColor:"transparent"
 	 	}
 	   return (
-	       <Animated.View style={scale} ref="animated">
-	       		<View  {...this.props} {...this._panResponder.panHandlers} />
+	       <Animated.View style={scale} ref="animated" {...this._panResponder.panHandlers}>
+	       		<View {...this.props}  />
 	       </Animated.View>
 	   );
 	 },
-	 _handleStartShouldSetPanResponder: function(e: Object, gestureState: Object): boolean {
-	    return true;
+	 _checkInEdge:function(gestureState:Object):Boolean{
+	    	if (gestureState.x0 < edge || gestureState.x0 > screen.width-edge){
+	    		return true;
+	    	}
+	       return false;
+	 },
+	 _handleStartShouldSetPanResponder: function(e: Object, gestureState: Object): Boolean {
+	 	return false;
 	  },
-	  _handleMoveShouldSetPanResponder: function(e: Object, gestureState: Object): boolean {
-	    return true;
+	  _handleMoveShouldSetPanResponder: function(e: Object, gestureState: Object): Boolean {
+	  		if ( ((gestureState.moveX -gestureState.x0) < edge) || ((gestureState.moveX - gestureState.x0) > screen.width-edge)){
+	  			return true;
+	  		}
+	  	   return false;
+	  },
+	  _handleMoveShouldSetPanResponderCapture:function(e: Object, gestureState: Object): Boolean {
+	  	this._checkInEdge(gestureState)
 	  },
 	  _swiperLeftEvent(){
 	  	this.props.swiperLeft();
@@ -96,12 +113,15 @@ var Responder = React.createClass({
 	  _swiperRightEvent(){
 	  	this.props.swiperRight();
 	  },
+	  _notSwiperEvent(){
+	  	// this.props.isNotSwiper();
+	  }
 })
 
 var styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:"transparent"
+    backgroundColor:"transparent",
   },
 });
 

@@ -54,7 +54,7 @@ var ShotList = React.createClass({
   },
 
   componentWillMount: function() {
-    // this.getShots(this.state.filter);
+    this.getShots(this.state.filter);
 
   },
   _scrollToTop:function(){

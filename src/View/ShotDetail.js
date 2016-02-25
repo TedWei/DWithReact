@@ -131,7 +131,7 @@ var ShotDetails = React.createClass({
     return (
       <ScrollView
         style={styles.scrollView}>
-        <View style={styles.container}>
+        <View >
           <Image source={getImage.shotImage(this.props.shot)} style={styles.imageView} />
           <View style={styles.headerContent}>
               <View style={styles.avatarAndMore}>
@@ -232,19 +232,11 @@ var ShotDetails = React.createClass({
       onSelect={() => this.selectPlayer(comment.user)}
       comment={comment} />;
   },
-
-  _renderLoading: function() {
-    return <ActivityIndicatorIOS animating={this.state.isLoading}
-                                 style={styles.spinner}/>;
-  }
 });
 
 var styles = StyleSheet.create({
   container:{
     flex:1,
-    backgroundColor:"#fff",
-    height:screen.height,
-    width:screen.width,
   },
   spinner: {
     marginTop: 20,

@@ -9,6 +9,7 @@ import React,{
 	TouchableOpacity,
 	Modal,
 	Animated,
+	ScrollView,
 } from 'react-native'
 
 var getImage = require("../components/getImage"),
@@ -93,9 +94,17 @@ var Test = React.createClass({
 		var enter = {
 			transform:[{translateY:this.state.translateY}]
 		}
-		return ( 
+		var container = (<ScrollView
+		  contentContainerStyle={styles.contentContainer}
+		  style={styles.scrollView}>
+		  <Image style={styles.image} source={getImage.authorAvatar()} />
+		  <Image style={styles.image} source={getImage.authorAvatar()} />
+		  <Image style={styles.image} source={getImage.authorAvatar()} />
+		  <Image style={styles.image} source={getImage.authorAvatar()} />
+		</ScrollView>);
+		return (
 			<View>
-			<ModalWithBlur style={{top:100}} closeModal={this._closeModal} modalContainer={<Image style={styles.image} source={getImage.authorAvatar()} />} />
+			<ModalWithBlur style={{top:100}} closeModal={this._closeModal} modalContainer={container}/>
 			<ModalWithAnimated.Tips >
 			<Text style={styles.tips}>{"xhangdf"}</Text>
 			</ModalWithAnimated.Tips>

@@ -73,7 +73,8 @@ class Tips extends ModalWithAnimated {
 		).start(this._setCallback.bind(this));
 	}
 	_setCallback(){
-		this.props.callback();
+		console.log("tips hidden")
+		// this.props.callback();
 	}
 	render(){
 		var enter = {
