@@ -99,7 +99,7 @@ var Responder = React.createClass({
 	 	return false;
 	  },
 	  _handleMoveShouldSetPanResponder: function(e: Object, gestureState: Object): Boolean {
-	  		if ( ((gestureState.moveX -gestureState.x0) < edge) || ((gestureState.moveX - gestureState.x0) > screen.width-edge)){
+	  		if ( ((gestureState.moveX -gestureState.dx) < edge) || ((gestureState.moveX - gestureState.dx) > screen.width-edge)){
 	  			return true;
 	  		}
 	  	   return false;
