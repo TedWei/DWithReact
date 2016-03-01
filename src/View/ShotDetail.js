@@ -234,6 +234,15 @@ var ShotDetails = React.createClass({
       })
     }
   },
+  _deleteComment(comment:Object){
+    var newComments = this.state.dataSource.filter(function(value){
+      return value !=comment;
+    })
+    this.setState({
+      dataSource: this.state.dataSource.cloneWithRows(newComments),
+      isLoading: false
+    });
+  },
   _renderCommentsList: function() {
     return <View style={styles.sectionSpacing}>
       <View style={styles.separator} />
@@ -255,6 +264,8 @@ var ShotDetails = React.createClass({
           this._replay(comment.user)
         }else if (action == "player"){
           this.selectPlayer(comment.user)
+        }else if (action == "delete"){
+          this._deleteComment(comment)
         }
       }}
       comment={comment} key={comment.id} shot={this.props.shot} />;

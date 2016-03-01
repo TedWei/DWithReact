@@ -123,7 +123,7 @@ var CommentItem = React.createClass({
         transform: [{scaleX: this.state.heartScale}, {scaleY: this.state.heartScale}],
     }
     return <View>
-      <TouchableHighlight underlayColor={"#f3f3f3"} onPress={()=>{this.props.onSelect("reply")}}>
+      <TouchableWithoutFeedback underlayColor={"#f3f3f3"} onPress={()=>{this.props.onSelect("reply")}} onLongPress={()=>{this.props.onSelect("delete")}}>
         <View>
           <View style={styles.commentContent}>
           <TouchableHighlight onPress={()=>{this.props.onSelect("player")}} underlayColor={"#f3f3f3"}>
@@ -159,7 +159,7 @@ var CommentItem = React.createClass({
           </View>
           <View style={styles.cellBorder} />
         </View>
-      </TouchableHighlight>
+      </TouchableWithoutFeedback>
     </View>;
   }
 });
