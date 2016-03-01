@@ -9,6 +9,8 @@ import React,{
 
 var screen = Dimensions.get('window');
 
+const {BlurView,VibrancyView} = require("react-native-blur");
+
 class ModalWithAnimated extends Component {
 	constructor(props){
 		super(props);
@@ -34,9 +36,11 @@ class ModalWithAnimated extends Component {
 			transform:[{translateY:this.state.translateY}]
 		}
 		return (
+			<BlurView blurType="dark" style={styles.blur}>
 			<Animated.View style={[styles.container,enter]} >
 			<View {...this.props} />
 			</Animated.View>
+			</BlurView>
 			)
 	}
 }
@@ -98,7 +102,8 @@ const styles = StyleSheet.create({
 	tips:{
 		flex:1,
 		width:screen.width,
-		height:20,
+		height:48,
+		paddingTop:20,
 		top:0,
 		position:"absolute",
 		backgroundColor:"#ea4c89",
