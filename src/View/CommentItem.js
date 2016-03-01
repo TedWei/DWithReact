@@ -9,11 +9,13 @@ var {
   TouchableHighlight,
   View,
   Component,
-  Dimensions
+  Dimensions,
+  Animated,
 } = React;
 
 var Icon = require("react-native-vector-icons/FontAwesome"),
     getImage = require("../components/getImage"),
+    Comment = require("../model/Comment"),
     HTML = require("react-native-htmlview"),
     screen = Dimensions.get('window');
 
@@ -27,23 +29,61 @@ var CommentItem = React.createClass({
     return {
       liked:false,
       commenting:false,
+      likes:[],
+      heartScale:new Animated.Value(1),
+      likes_count:this.props.comment.likes_count,
     }
   },
   componentWillMount(){
   },
   componentDidMount(){
     this.checkLiked();
+    this.getLikes();
   },
   checkLiked(){
     var _that=this;
-        var comment = new Comment(this.props.shot.id,this.props.comment);
-        comment.isLike().then((isLike)=>{
-          if (isLiked){
-            _that.setState({
-              liked:true
-            })
-          }
+    var comment = new Comment(this.props.shot.id,this.props.comment);
+    comment.isLike().then((isLike)=>{
+      if (isLike){
+        _that.setState({
+          liked:true
         })
+      }
+    })
+  },
+  getLikes(){
+    var _that=this;
+    var comment = new Comment(this.props.shot.id,this.props.comment);
+    comment.getLikes().then((responseDate)=>{
+      console.log(responseDate)
+      _that.setState({
+        likes:responseDate
+      })
+    })
+  },
+  _animatedHeart(){
+      this.state.heartScale.setValue(1.5);     // Start large
+      Animated.spring(                          // Base: spring, decay, timing
+        this.state.heartScale,                 // Animate `bounceValue`
+        {
+          toValue: 1,                         // Animate to smaller size
+          friction: 1,                          // Bouncier spring
+        }
+      ).start();                                // Start the animation
+  },
+  _renderUnlike(){
+    this.setState({
+      likes_count:this.state.likes_count-1,
+      liked:false,
+    })
+    this._animatedHeart();
+  },
+  _renderLike(){
+    this.setState({
+      likes_count:this.state.likes_count+1,
+      liked:true,
+    })
+    this._animatedHeart();
   },
   like(){
     var comment = new Comment(this.props.shot.id,this.props.comment);
@@ -72,19 +112,28 @@ var CommentItem = React.createClass({
     })
   },
   _renderComment(){
-    
+
   },
   render: function() {
+    var createLikes = function(elem){
+      return (<Image key={elem.id} source={getImage.authorAvatar(elem.user)}
+                     style={styles.smallAvatar}/>)
+    }
+    var heart = {
+        transform: [{scaleX: this.state.heartScale}, {scaleY: this.state.heartScale}],
+    }
     return <View>
-      <TouchableHighlight underlayColor={"#f3f3f3"}>
+      <TouchableHighlight underlayColor={"#f3f3f3"} onPress={()=>{this.props.onSelect("reply")}}>
         <View>
           <View style={styles.commentContent}>
-          <TouchableHighlight onPress={this.props.onSelect.bind(this, this.props.comment)} underlayColor={"#f3f3f3"}>
+          <TouchableHighlight onPress={()=>{this.props.onSelect("player")}} underlayColor={"#f3f3f3"}>
               <Image source={getImage.authorAvatar(this.props.comment.user)}
                      style={styles.avatar}/>
                      </TouchableHighlight>
             <View style={styles.commentBody}>
-            <TouchableHighlight onPress={this.props.onSelect.bind(this, this.props.comment)} underlayColor={"#f3f3f3"}>
+            <TouchableHighlight onPress={()=>{
+              this.props.onSelect("player")
+            }} underlayColor={"#f3f3f3"}>
               <Text style={styles.userName}>
                 {this.props.comment.user.name}
               </Text>
@@ -93,6 +142,20 @@ var CommentItem = React.createClass({
                 <HTML value={this.props.comment.body} />
               </Text>
             </View>
+          </View>
+          <View style={styles.comment_likes_content}>
+              <View style={styles.comment_likes}>
+              {this.state.likes.map(createLikes)}
+              </View>
+              <View style={styles.like}>
+              <TouchableHighlight style={styles.invisibleTouch}
+                              onPress={this.like}
+                              underlayColor={"#fff"}
+                              activeOpacity={0.95}>
+                <Animated.View style={heart}><Icon name={this.state.liked ? "heart" : "heart-o"} size={16} color={this.state.liked ?"#ea4c89":"#333"}/></Animated.View>
+                </TouchableHighlight>
+                <Text style={styles.shotCounterText}> {this.state.likes_count} </Text>
+              </View>
           </View>
           <View style={styles.cellBorder} />
         </View>
@@ -109,7 +172,8 @@ var styles = StyleSheet.create({
     alignItems: "flex-start"
   },
   userName: {
-    fontWeight: "700"
+    fontWeight: "400",
+    color:"blue"
   },
   commentBody: {
     flex: 1,
@@ -122,7 +186,6 @@ var styles = StyleSheet.create({
   },
   cellBorder: {
     backgroundColor: "rgba(0, 0, 0, 0.2)",
-    // Trick to get the thinest line the device can display
     height: 1 / PixelRatio.get(),
     marginLeft: 4,
   },
@@ -131,7 +194,30 @@ var styles = StyleSheet.create({
     width: 40,
     height: 40,
     marginRight: 10
-  }
+  },
+  comment_likes_content:{
+    width:screen.width,
+    paddingLeft: 10,
+    paddingRight:10,
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "stretch"
+  },
+  comment_likes:{
+    flex:1,
+    flexDirection:"row",
+    justifyContent:"flex-end",
+  },
+  like:{
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  smallAvatar:{
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    marginRight: 10
+  },
 });
 
 module.exports = CommentItem;

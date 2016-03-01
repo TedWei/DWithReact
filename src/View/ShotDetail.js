@@ -7,6 +7,7 @@ var {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   TouchableHighlight,
   ActivityIndicatorIOS,
@@ -34,6 +35,7 @@ var Player = require("./Player"),
     Loading = require("../components/Loading");
 
 var ShotDetails = React.createClass({
+  commentDraft:"",
   getInitialState: function() {
     return {
       isLoading: true,
@@ -43,6 +45,7 @@ var ShotDetails = React.createClass({
       heartScale:new Animated.Value(1),
       liked:false,
       likes_count:this.props.shot.likes_count,
+      commentDraft:""
     };
   },
   componentWillMount(){
@@ -88,7 +91,6 @@ var ShotDetails = React.createClass({
   like(){
     var shot =new Shot(this.props.shot);
     var isLike = this.state.liked;
-    // shot.isLike().then((isLike)=>{
       if (isLike){
         shot.unlike().then((unliked)=>{
           if (unliked){
@@ -106,7 +108,6 @@ var ShotDetails = React.createClass({
           }
         })
       }
-    // })
   },
   _renderUnlike(){
     this.setState({
@@ -129,9 +130,10 @@ var ShotDetails = React.createClass({
         transform: [{scaleX: this.state.heartScale}, {scaleY: this.state.heartScale}],
     }
     return (
+      <View style={styles.container}>
       <ParallaxView
       background={(<Image source={getImage.shotImage(this.props.shot)} style={styles.imageView} />)}>
-        <View >
+        <View style={styles.container}>
           <View style={styles.headerContent}>
               <View style={styles.avatarAndMore}>
               <Image source={getImage.authorAvatar(player)}
@@ -173,6 +175,17 @@ var ShotDetails = React.createClass({
           </View>
         </View>
         </ParallaxView>
+        <View style={styles.replyComment}>
+            <TextInput
+                style={styles.replyInput}
+                onChangeText={(text) => this.setState({commentDraft:text})}
+                value={this.state.commentDraft}
+              />
+            <TouchableOpacity>
+            <View style={styles.replyBtn}>send</View>
+            </TouchableOpacity>
+        </View>
+        </View>
     );
   },
 
@@ -204,8 +217,8 @@ var ShotDetails = React.createClass({
   },
 
   selectPlayer: function(player: Object) {
-    console.log(player)
-    console.log(this)
+    // console.log(player)
+    // console.log(this)
     // this.props.navigator.push({
     //   component: Player,
     //   passProps: {player},
@@ -213,6 +226,14 @@ var ShotDetails = React.createClass({
     // });
   },
 
+  _replay(player:Object){
+    var commentDraft = this.state.commentDraft;
+    if (commentDraft.indexOf(player.username) === -1){
+      this.setState({
+        commentDraft:commentDraft+"@"+player.username+" "
+      })
+    }
+  },
   _renderCommentsList: function() {
     return <View style={styles.sectionSpacing}>
       <View style={styles.separator} />
@@ -229,8 +250,14 @@ var ShotDetails = React.createClass({
 
   renderRow: function(comment: Object) {
     return <CommentItem
-      onSelect={() => this.selectPlayer(comment.user)}
-      comment={comment} shot={this.props.shot} />;
+      onSelect={(action) => {
+        if (action =="reply"){
+          this._replay(comment.user)
+        }else if (action == "player"){
+          this.selectPlayer(comment.user)
+        }
+      }}
+      comment={comment} key={comment.id} shot={this.props.shot} />;
   },
 });
 
@@ -313,7 +340,6 @@ var styles = StyleSheet.create({
     flexDirection: "row",
     width:screen.width/3,
     position:"absolute",
-    // bottom:-10,
     right:10,
     top:10,
   },
@@ -330,6 +356,7 @@ var styles = StyleSheet.create({
     flex: 1,
     alignItems: "stretch",
     padding: 10,
+    paddingBottom:40,
     backgroundColor: "white"
   },
   separator: {
@@ -343,6 +370,23 @@ var styles = StyleSheet.create({
   heading: {
     fontWeight: "700",
     fontSize: 16
+  },
+  replyComment:{
+    position:"absolute",
+    bottom:0,
+    left:0,
+    width:screen.width,
+    backgroundColor: "#fff",
+    flexDirection:"row"
+  },
+  replyInput:{
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    flex:1,
+  },
+  replyBtn:{
+    width:60,
   }
 });
 

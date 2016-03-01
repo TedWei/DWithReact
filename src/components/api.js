@@ -34,6 +34,8 @@ function fetchData(URL,setting) {
             return responseData.json();
         }else if (responseData.status === 0){
             RCTDeviceEventEmitter.emit('notification',{category:"tips",content:JSON.stringify(responseData)});
+        }else if (responseData.status === 429){
+            RCTDeviceEventEmitter.emit('notification',{category:"tips",content:responseData.json().message});
         }else{
             return responseData;
         }
