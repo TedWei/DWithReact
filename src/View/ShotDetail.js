@@ -129,10 +129,9 @@ var ShotDetails = React.createClass({
         transform: [{scaleX: this.state.heartScale}, {scaleY: this.state.heartScale}],
     }
     return (
-      <ScrollView
-        style={styles.scrollView}>
+      <ParallaxView
+      background={(<Image source={getImage.shotImage(this.props.shot)} style={styles.imageView} />)}>
         <View >
-          <Image source={getImage.shotImage(this.props.shot)} style={styles.imageView} />
           <View style={styles.headerContent}>
               <View style={styles.avatarAndMore}>
               <Image source={getImage.authorAvatar(player)}
@@ -173,7 +172,7 @@ var ShotDetails = React.createClass({
             </View>
           </View>
         </View>
-        </ScrollView>
+        </ParallaxView>
     );
   },
 
@@ -206,6 +205,7 @@ var ShotDetails = React.createClass({
 
   selectPlayer: function(player: Object) {
     console.log(player)
+    console.log(this)
     // this.props.navigator.push({
     //   component: Player,
     //   passProps: {player},
@@ -230,7 +230,7 @@ var ShotDetails = React.createClass({
   renderRow: function(comment: Object) {
     return <CommentItem
       onSelect={() => this.selectPlayer(comment.user)}
-      comment={comment} />;
+      comment={comment} shot={this.props.shot} />;
   },
 });
 
@@ -252,8 +252,9 @@ var styles = StyleSheet.create({
     marginTop: 0,
   },
   imageView:{
+    flex:1,
     width:screen.width,
-    height:screen.height/3,
+    resizeMode: 'cover'
   },
   invisibleView: {
     flex: 1,
@@ -289,7 +290,7 @@ var styles = StyleSheet.create({
   },
   player: {
     fontWeight: "900",
-    lineHeight: 18
+    lineHeight: 18,
   },
   playerAvatar: {
     width: 40,

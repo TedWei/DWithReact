@@ -20,21 +20,75 @@ var Icon = require("react-native-vector-icons/FontAwesome"),
 var CommentItem = React.createClass({
   getDefaultProps: function() {
     return {
-      comments: []
+      comments: [],
     }
   },
-
+  getInitialState(){
+    return {
+      liked:false,
+      commenting:false,
+    }
+  },
+  componentWillMount(){
+  },
+  componentDidMount(){
+    this.checkLiked();
+  },
+  checkLiked(){
+    var _that=this;
+        var comment = new Comment(this.props.shot.id,this.props.comment);
+        comment.isLike().then((isLike)=>{
+          if (isLiked){
+            _that.setState({
+              liked:true
+            })
+          }
+        })
+  },
+  like(){
+    var comment = new Comment(this.props.shot.id,this.props.comment);
+    var isLike = this.state.liked;
+      if (isLike){
+        comment.unlike().then((unliked)=>{
+          if (unliked){
+            this._renderUnlike();
+          }else{
+            this._renderLike();
+          }
+        })
+      }else{
+        comment.like().then((liked)=>{
+          if (liked){
+            this._renderLike();
+          }else{
+            this._renderUnlike();
+          }
+        })
+      }
+  },
+  _replyComment(){
+    this.setState({
+      commenting:true,
+    })
+  },
+  _renderComment(){
+    
+  },
   render: function() {
     return <View>
-      <TouchableHighlight onPress={this.props.onSelect.bind(this, this.props.comment)} underlayColor={"#f3f3f3"}>
+      <TouchableHighlight underlayColor={"#f3f3f3"}>
         <View>
           <View style={styles.commentContent}>
+          <TouchableHighlight onPress={this.props.onSelect.bind(this, this.props.comment)} underlayColor={"#f3f3f3"}>
               <Image source={getImage.authorAvatar(this.props.comment.user)}
                      style={styles.avatar}/>
+                     </TouchableHighlight>
             <View style={styles.commentBody}>
+            <TouchableHighlight onPress={this.props.onSelect.bind(this, this.props.comment)} underlayColor={"#f3f3f3"}>
               <Text style={styles.userName}>
                 {this.props.comment.user.name}
               </Text>
+              </TouchableHighlight>
               <Text style={styles.commentText}>
                 <HTML value={this.props.comment.body} />
               </Text>
