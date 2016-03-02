@@ -3,8 +3,10 @@ var api = require("../components/api");
 var utils = require("../components/utils");
 class Comment {
     constructor(shotId: ? Number, comment : ? Object) {
-        this.comment = comment;
-        this.id = comment.id;
+        if (comment){
+            this.comment = comment;
+            this.id = comment.id;
+        }
         this.shotId = shotId;
         this.baseUrl = "shots/" + this.shotId + "/comments";
     }

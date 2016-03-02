@@ -10,6 +10,7 @@ var {
   View,
   Component,
   Dimensions,
+  TouchableWithoutFeedback,
   Animated,
 } = React;
 
@@ -42,7 +43,7 @@ var CommentItem = React.createClass({
   },
   checkLiked(){
     var _that=this;
-    var comment = new Comment(this.props.shot.id,this.props.comment);
+    let comment = new Comment(this.props.shot.id,this.props.comment);
     comment.isLike().then((isLike)=>{
       if (isLike){
         _that.setState({
@@ -53,9 +54,8 @@ var CommentItem = React.createClass({
   },
   getLikes(){
     var _that=this;
-    var comment = new Comment(this.props.shot.id,this.props.comment);
+    let comment = new Comment(this.props.shot.id,this.props.comment);
     comment.getLikes().then((responseDate)=>{
-      console.log(responseDate)
       _that.setState({
         likes:responseDate
       })

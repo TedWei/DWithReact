@@ -181,8 +181,8 @@ var ShotDetails = React.createClass({
                 onChangeText={(text) => this.setState({commentDraft:text})}
                 value={this.state.commentDraft}
               />
-            <TouchableOpacity>
-            <View style={styles.replyBtn}>send</View>
+            <TouchableOpacity activeOpacity={0.95} onPress={this.sendComment}>
+            <View style={styles.replyBtn}><Text>{"send"}</Text></View>
             </TouchableOpacity>
         </View>
         </View>
@@ -242,6 +242,18 @@ var ShotDetails = React.createClass({
       dataSource: this.state.dataSource.cloneWithRows(newComments),
       isLoading: false
     });
+  },
+  sendComment(){
+    let shot =new Shot(this.props.shot);
+    let comment = new Comment(shot.id);
+    comment.create(this.state.commentDraft).then((created)=>{
+      console.log(created)
+      if (created){
+
+      }else{
+
+      }
+    }).done();
   },
   _renderCommentsList: function() {
     return <View style={styles.sectionSpacing}>
