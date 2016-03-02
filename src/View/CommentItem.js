@@ -11,6 +11,7 @@ var {
   Component,
   Dimensions,
   TouchableWithoutFeedback,
+  TouchableOpacity,
   Animated,
 } = React;
 
@@ -126,18 +127,18 @@ var CommentItem = React.createClass({
       <TouchableWithoutFeedback underlayColor={"#f3f3f3"} onPress={()=>{this.props.onSelect("reply")}} onLongPress={()=>{this.props.onSelect("delete")}}>
         <View>
           <View style={styles.commentContent}>
-          <TouchableHighlight onPress={()=>{this.props.onSelect("player")}} underlayColor={"#f3f3f3"}>
+          <TouchableOpacity onPress={()=>{this.props.onSelect("player")}} underlayColor={"#f3f3f3"}>
               <Image source={getImage.authorAvatar(this.props.comment.user)}
                      style={styles.avatar}/>
-                     </TouchableHighlight>
+          </TouchableOpacity>
             <View style={styles.commentBody}>
-            <TouchableHighlight onPress={()=>{
+            <TouchableOpacity onPress={()=>{
               this.props.onSelect("player")
             }} underlayColor={"#f3f3f3"}>
               <Text style={styles.userName}>
                 {this.props.comment.user.name}
               </Text>
-              </TouchableHighlight>
+              </TouchableOpacity>
               <Text style={styles.commentText}>
                 <HTML value={this.props.comment.body} />
               </Text>
@@ -148,12 +149,12 @@ var CommentItem = React.createClass({
               {this.state.likes.map(createLikes)}
               </View>
               <View style={styles.like}>
-              <TouchableHighlight style={styles.invisibleTouch}
+              <TouchableOpacity style={styles.invisibleTouch}
                               onPress={this.like}
                               underlayColor={"#fff"}
                               activeOpacity={0.95}>
                 <Animated.View style={heart}><Icon name={this.state.liked ? "heart" : "heart-o"} size={16} color={this.state.liked ?"#ea4c89":"#333"}/></Animated.View>
-                </TouchableHighlight>
+                </TouchableOpacity>
                 <Text style={styles.shotCounterText}> {this.state.likes_count} </Text>
               </View>
           </View>

@@ -8,7 +8,6 @@ import RCTDeviceEventEmitter from "RCTDeviceEventEmitter";
 
 var API_URL = "https://api.dribbble.com/v1/",
     ACCESS_TOKEN = "",
-    // ACCESS_TOKEN = "4fb0ff870de6bb9a3122ccf9f899e9c6a7a4ca135feda2d53d652e5e6a57da26",
     CLIENT_ID = "02f5319f14a914740fe29fca2ded71e4435e4dc4bff14117aad846ad5b12eeb7",
     CLIENT_SECRET = "a481300ee6005a80cbd39d4cf0722260eb8637cca30024cbf293e983739c318e",
     AUTHORIZE_URL = "https://dribbble.com/oauth/authorize",
