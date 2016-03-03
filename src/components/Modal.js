@@ -36,11 +36,9 @@ class ModalWithAnimated extends Component {
 			transform:[{translateY:this.state.translateY}]
 		}
 		return (
-			<BlurView blurType="dark" style={styles.blur}>
 			<Animated.View style={[styles.container,enter]} >
 			<View {...this.props} />
 			</Animated.View>
-			</BlurView>
 			)
 	}
 }
@@ -97,7 +95,7 @@ class Tips extends ModalWithAnimated {
 
 const styles = StyleSheet.create({
 	container:{
-		backgroundColor:"#fff",
+		backgroundColor:"transparent",
 	},
 	tips:{
 		flex:1,

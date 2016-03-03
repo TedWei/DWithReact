@@ -26,12 +26,14 @@ var Icon = require("react-native-vector-icons/FontAwesome"),
     HTML = require("react-native-htmlview"),
     screen = Dimensions.get('window'),
     ParallaxView = require("react-native-parallax-view"),
-    rebound = require('rebound');
+    rebound = require('rebound'),
+    RCTDeviceEventEmitter = require("RCTDeviceEventEmitter");
 
 var Player = require("./Player"),
     CommentItem = require("./CommentItem"),
     Shot = require("../model/Shot"),
     Comment = require("../model/Comment"),
+    ConfirmList = require("../components/ConfirmList"),
     Loading = require("../components/Loading");
 
 var ShotDetails = React.createClass({
@@ -56,7 +58,8 @@ var ShotDetails = React.createClass({
     shot.getComment().then((responseData) => {
       this.setState({
         dataSource: this.state.dataSource.cloneWithRows(responseData),
-        isLoading: false
+        isLoading: false,
+        comments:responseData,
       });
       return responseData;
     }).then((responseData)=>{
@@ -182,7 +185,7 @@ var ShotDetails = React.createClass({
                 value={this.state.commentDraft}
               />
             <TouchableOpacity activeOpacity={0.95} onPress={this.sendComment}>
-            <View style={styles.replyBtn}><Text>{"send"}</Text></View>
+            <View style={styles.replyBtn}><Icon name={this.state.commentDraft.length ? "paper-plane" : "paper-plane-o"} size={16} color={this.state.commentDraft.length ?"#fff":"#333"}/></View>
             </TouchableOpacity>
         </View>
         </View>
@@ -235,25 +238,42 @@ var ShotDetails = React.createClass({
     }
   },
   _deleteComment(comment:Object){
-    var newComments = this.state.dataSource.filter(function(value){
-      return value !=comment;
-    })
+    RCTDeviceEventEmitter.emit('showConfirm',ConfirmList);
+    // var _that = this;
+    // let shot =new Shot(this.props.shot);
+    // let newComment = new Comment(shot.id,comment);
+    // newComment.delete().then((Deleted)=>{
+    //   if (Deleted){
+    //     var newComments = this.state.comments.filter(function(value){
+    //       return value !=comment;
+    //     })
+    //     _that._updateComments(newComments);
+    //     _that._showTips("删除评论成功");
+    //   }
+    // })
+  },
+  _updateComments(newComments){
     this.setState({
       dataSource: this.state.dataSource.cloneWithRows(newComments),
-      isLoading: false
+      isLoading: false,
+      comments:newComments,
     });
   },
   sendComment(){
+    var _that = this;
     let shot =new Shot(this.props.shot);
     let comment = new Comment(shot.id);
-    comment.create(this.state.commentDraft).then((created)=>{
-      console.log(created)
-      if (created){
-
+    comment.create(this.state.commentDraft).then((responseData)=>{
+      if (responseData){
+        _that._updateComments(responseData);
+        _that._showTips("发布评论成功");
       }else{
-
+        _that._showTips("发布评论失败");
       }
     }).done();
+  },
+  _showTips(content){
+    RCTDeviceEventEmitter.emit('notification',{category:"tips",content:content});
   },
   _renderCommentsList: function() {
     return <View style={styles.sectionSpacing}>
@@ -287,6 +307,7 @@ var ShotDetails = React.createClass({
 var styles = StyleSheet.create({
   container:{
     flex:1,
+    backgroundColor:"#fff"
   },
   spinner: {
     marginTop: 20,
@@ -403,13 +424,17 @@ var styles = StyleSheet.create({
     flexDirection:"row"
   },
   replyInput:{
-    height: 40,
+    height: 32,
     borderColor: 'gray',
     borderWidth: 1,
     flex:1,
   },
   replyBtn:{
-    width:60,
+    width:48,
+    backgroundColor:"#ea4c89",
+    alignItems:"center",
+    justifyContent: "center",
+    height: 32,
   }
 });
 

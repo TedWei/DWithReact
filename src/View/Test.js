@@ -17,6 +17,8 @@ var getImage = require("../components/getImage"),
 	ModalWithBlur = require("./ModalWithBlur"),
 	Responder = require("../components/Responder"),
 	ModalWithAnimated = require("../components/Modal"),
+	ConfirmList =  require("../components/ConfirmList"),
+	RCTDeviceEventEmitter = require("RCTDeviceEventEmitter"),
 	ShotDetailWithModal = require("./ShotDetailWithModal");
 const {BlurView,VibrancyView} = require("react-native-blur");
 
@@ -90,6 +92,9 @@ var Test = React.createClass({
 		})
 		this._cancelAnimatedHeart();
 	},
+	_showConfirm(){
+		RCTDeviceEventEmitter.emit('showConfirm',ConfirmList);
+	},
 	_renderModal(){
 		var enter = {
 			transform:[{translateY:this.state.translateY}]
@@ -97,7 +102,9 @@ var Test = React.createClass({
 		var container = (<ScrollView
 		  contentContainerStyle={styles.contentContainer}
 		  style={styles.scrollView}>
+		  <TouchableOpacity onPress={this._showConfirm}>
 		  <Image style={styles.image} source={getImage.authorAvatar()} />
+		  </TouchableOpacity>
 		  <Image style={styles.image} source={getImage.authorAvatar()} />
 		  <Image style={styles.image} source={getImage.authorAvatar()} />
 		  <Image style={styles.image} source={getImage.authorAvatar()} />
@@ -202,6 +209,10 @@ var styles = StyleSheet.create({
         	opacity:1,
         	top:100,
         	position:"absolute",
+        },
+        scrollView:{
+        	backgroundColor:"#fff",
+        	flex:1
         }
 });
 

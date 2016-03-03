@@ -34,6 +34,7 @@ var CommentItem = React.createClass({
       likes:[],
       heartScale:new Animated.Value(1),
       likes_count:this.props.comment.likes_count,
+      opacity:new Animated.Value(1),
     }
   },
   componentWillMount(){
@@ -41,6 +42,16 @@ var CommentItem = React.createClass({
   componentDidMount(){
     this.checkLiked();
     this.getLikes();
+  },
+  componentWillUnmount(){
+    this.state.opacity.setValue(1);
+    Animated.timing(
+      this.state.opacity,
+      {
+        toValue: 0,
+        duration:1000,
+      }
+    ).start();
   },
   checkLiked(){
     var _that=this;
@@ -123,12 +134,12 @@ var CommentItem = React.createClass({
     var heart = {
         transform: [{scaleX: this.state.heartScale}, {scaleY: this.state.heartScale}],
     }
-    return <View>
+    return (<Animated.View style={{opacity:this.state.opacity}}>
       <TouchableWithoutFeedback underlayColor={"#f3f3f3"} onPress={()=>{this.props.onSelect("reply")}} onLongPress={()=>{this.props.onSelect("delete")}}>
         <View>
           <View style={styles.commentContent}>
           <TouchableOpacity onPress={()=>{this.props.onSelect("player")}} underlayColor={"#f3f3f3"}>
-              <Image source={getImage.authorAvatar(this.props.comment.user)}
+          <Image source={getImage.authorAvatar(this.props.comment.user)}
                      style={styles.avatar}/>
           </TouchableOpacity>
             <View style={styles.commentBody}>
@@ -161,7 +172,8 @@ var CommentItem = React.createClass({
           <View style={styles.cellBorder} />
         </View>
       </TouchableWithoutFeedback>
-    </View>;
+      </Animated.View>
+      );
   }
 });
 
@@ -170,7 +182,8 @@ var styles = StyleSheet.create({
     padding: 10,
     flex: 1,
     flexDirection: "row",
-    alignItems: "flex-start"
+    alignItems: "flex-start",
+    position:"relative"
   },
   userName: {
     fontWeight: "400",

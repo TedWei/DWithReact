@@ -27,6 +27,9 @@ var Test = React.createClass({
 	closeModal(){
 		this.props.closeModal()
 	},
+	componentWillMount(){
+		console.log(this)
+	},
 	render(){
 		return (
 			<View style={[styles.container,styles.blankView]}>
@@ -99,14 +102,14 @@ var styles = StyleSheet.create({
     	top:100,
     	position:"absolute",
     	opacity:1,
-    	backgroundColor:"#transparent",
+    	backgroundColor:"transparent",
     	overflow:"hidden",
     },
     modalContainer:{
     	flex: 1,
     	width:screen.width,
     	height:screen.height-100,
-    	backgroundColor:"#fff",
+    	backgroundColor:"transparent",
     }
 });
 

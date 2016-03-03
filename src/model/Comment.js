@@ -16,7 +16,7 @@ class Comment {
             body: comment
         }).then((responseData) => {
             if (responseData.id) {
-                return true;
+                return responseData;
             }
             return false;
         })
@@ -32,15 +32,14 @@ class Comment {
             body: comment
         }).then((responseData) => {
             if (responseData.id) {
-                return true;
+                return responseData;
             }
             return false;
         })
     }
     delete() {
         return api.request(this.baseUrl + "/" + this.comment.id, {
-            method: "delete",
-            body: comment
+            method: "delete"
         }).then((responseData) => {
             if (responseData.status === 204) {
                 return true;

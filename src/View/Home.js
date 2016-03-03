@@ -75,6 +75,10 @@ var Home= React.createClass({
 		RCTDeviceEventEmitter.addListener('closeModal',function(modal){
 		  _that._closeModal(modal)
 		})
+
+		RCTDeviceEventEmitter.addListener('showConfirm',function(modal){
+		  _that._showConfirm(modal)
+		})
 	},
 	_hanndleNotification(){
 		var _that =this;
@@ -86,7 +90,6 @@ var Home= React.createClass({
 		  		}
 		  	})
 		})
-		RCTDeviceEventEmitter.emit('notification',{category:"tips",content:"zhangsan"});
 	},
 	_showModal(modal){
 		this.setState({
@@ -122,19 +125,36 @@ var Home= React.createClass({
 	_renderModal(){
 		return (<ModalWithBlur closeModal={this._closeModal} modalContainer={this.state.modalContainer} />)
 	},
+	_renderConfirm(){
+		return (<ModalWithBlur closeModal={this._closeConfirm} modalContainer={this.state.confirm} />)
+	},
+	_showConfirm(modal){
+		this.setState({
+			confirm:modal,
+			showConfirm:true,
+		})
+	},
+	_closeConfirm(){
+		this.setState({
+			showConfirm:false,
+		})
+	},
 	_closeTips(){
 		this.setState({
 			notification:{},
 		})
 	},
 	_renderNotification(){
-		return (<ModalWithAnimated.Tips callback={this._closeTips}><Text style={styles.tips}>{this.state.notification.content}</Text></ModalWithAnimated.Tips>)
+		return (
+			<ModalWithAnimated.Tips callback={this._closeTips}><Text style={styles.tips}>{this.state.notification.content}</Text></ModalWithAnimated.Tips>
+			)
 	},
 	render(){
 		var scale = {
 		    transform: [{scaleX: this.state.viewScale}, {scaleY: this.state.viewScale}],
 		}
 	  return(
+	  	<View style={styles.rootWindow}>
 	  	<View style={styles.rootView}>
 	  	<View style={styles.blank}>
 	  	</View>
@@ -164,6 +184,8 @@ var Home= React.createClass({
 	    </View>
 	    </Animated.View>
 	    {this.state.isModalOpen ? this._renderModal():null}
+	    {this.state.showConfirm ? this._renderConfirm():null}
+	    </View>
 	    {this.state.notification.category ? this._renderNotification():null}
 	    </View>
 	    )
@@ -174,6 +196,9 @@ var Home= React.createClass({
 const styles = StyleSheet.create({
   wrapper: {
       flex: 1
+  },
+  rootWindow:{
+  	flex:1,
   },
   rootView:{
   	flex:1,
@@ -200,6 +225,9 @@ const styles = StyleSheet.create({
   },
   filter:{
   	backgroundColor:"#000"
+  },
+  tips:{
+  	alignItems:"center",
   },
 });
 
