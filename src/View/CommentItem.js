@@ -89,6 +89,7 @@ var CommentItem = React.createClass({
       liked:false,
     })
     this._animatedHeart();
+    this.getLikes();
   },
   _renderLike(){
     this.setState({
@@ -96,6 +97,7 @@ var CommentItem = React.createClass({
       liked:true,
     })
     this._animatedHeart();
+    this.getLikes();
   },
   like(){
     var comment = new Comment(this.props.shot.id,this.props.comment);
@@ -210,12 +212,10 @@ var styles = StyleSheet.create({
     marginRight: 10
   },
   comment_likes_content:{
-    width:screen.width,
     paddingLeft: 10,
     paddingRight:10,
     flex: 1,
     flexDirection: "row",
-    alignItems: "stretch"
   },
   comment_likes:{
     flex:1,

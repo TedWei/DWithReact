@@ -11,7 +11,7 @@ var {
   ActivityIndicatorIOS,
   ListView,
   Dimensions,
-  Modal
+  Modal,
 } = React;
 
 var Icon = require("react-native-vector-icons/FontAwesome"),
@@ -20,11 +20,11 @@ var Icon = require("react-native-vector-icons/FontAwesome"),
     screen = Dimensions.get('window'),
     ParallaxView = require("react-native-parallax-view");
 
-var api = require("../components/api");
-
-var ShotDetail = require("./ShotDetail");
-var ShotCell = require("./ShotCell");
-var Loading = require("../components/Loading");
+var api = require("../components/api"),
+    User = require("../model/User"),
+    ShotDetail = require("./ShotDetail"),
+    ShotCell = require("./ShotCell"),
+    Loading = require("../components/Loading");
 
 var Player = React.createClass({
 
@@ -42,10 +42,13 @@ var Player = React.createClass({
 
   componentWillMount: function() {
   },
-
+  async setCurrentUser(user){
+    await api.storage.setItem("User",JSON.stringify(user));
+  },
   componentDidMount:function(){
     if (!this.props.player){
       api.getUser().then((responseData)=>{
+        this.setCurrentUser(responseData).done();
         this.setState({
             player: responseData,
           })

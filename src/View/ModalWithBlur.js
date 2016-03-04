@@ -28,7 +28,6 @@ var Test = React.createClass({
 		this.props.closeModal()
 	},
 	componentWillMount(){
-		console.log(this)
 	},
 	render(){
 		return (

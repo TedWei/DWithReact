@@ -79,6 +79,9 @@ var Home= React.createClass({
 		RCTDeviceEventEmitter.addListener('showConfirm',function(modal){
 		  _that._showConfirm(modal)
 		})
+		RCTDeviceEventEmitter.addListener('hideConfirm',function(modal){
+		  _that._closeConfirm(modal)
+		})
 	},
 	_hanndleNotification(){
 		var _that =this;

@@ -64,7 +64,8 @@ var storage ={
         return value;
     },
     async setItem(name,value){
-        return await AsyncStorage.setItem(getConfig().STORAGE_PRE+name,value);
+        await AsyncStorage.setItem(getConfig().STORAGE_PRE+name,value);
+        return value;
     }
 };
 

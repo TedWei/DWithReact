@@ -14,7 +14,6 @@ var api = require("../components/api");
 
 var ShotCell = require("./ShotCell"),
     ShotDetail = require("./ShotDetail"),
-    ShotDetailWithModal = require("./ShotDetailWithModal"),
     ShotFilter = require("./ShotFilter"),
     Player = require("./Player"),
     Loading = require("../components/Loading"),

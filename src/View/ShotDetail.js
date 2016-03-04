@@ -32,6 +32,7 @@ var Icon = require("react-native-vector-icons/FontAwesome"),
 var Player = require("./Player"),
     CommentItem = require("./CommentItem"),
     Shot = require("../model/Shot"),
+    User = require("../model/User"),
     Comment = require("../model/Comment"),
     ConfirmList = require("../components/ConfirmList"),
     Loading = require("../components/Loading");
@@ -54,6 +55,7 @@ var ShotDetails = React.createClass({
   },
   componentDidMount: function() {
     this.checkLiked();
+    this._initUser().done();
     var shot =new Shot(this.props.shot);
     shot.getComment().then((responseData) => {
       this.setState({
@@ -178,16 +180,7 @@ var ShotDetails = React.createClass({
           </View>
         </View>
         </ParallaxView>
-        <View style={styles.replyComment}>
-            <TextInput
-                style={styles.replyInput}
-                onChangeText={(text) => this.setState({commentDraft:text})}
-                value={this.state.commentDraft}
-              />
-            <TouchableOpacity activeOpacity={0.95} onPress={this.sendComment}>
-            <View style={styles.replyBtn}><Icon name={this.state.commentDraft.length ? "paper-plane" : "paper-plane-o"} size={16} color={this.state.commentDraft.length ?"#fff":"#333"}/></View>
-            </TouchableOpacity>
-        </View>
+        {this.state.currentUser && this.state.currentUser.type =="player" ? this._renderReply():null}
         </View>
     );
   },
@@ -228,7 +221,12 @@ var ShotDetails = React.createClass({
     //   title: player.name
     // });
   },
-
+  async _initUser(){
+    var user = JSON.parse(await api.storage.getItem("User"));
+    this.setState({
+      currentUser:user
+    });
+  },
   _replay(player:Object){
     var commentDraft = this.state.commentDraft;
     if (commentDraft.indexOf(player.username) === -1){
@@ -237,20 +235,48 @@ var ShotDetails = React.createClass({
       })
     }
   },
+  _renderReply(){
+    return (
+      <View style={styles.replyComment}>
+          <TextInput
+              style={styles.replyInput}
+              onChangeText={(text) => this.setState({commentDraft:text})}
+              value={this.state.commentDraft}
+            />
+          <TouchableOpacity activeOpacity={0.95} onPress={this.sendComment}>
+          <View style={styles.replyBtn}><Icon name={this.state.commentDraft.length ? "paper-plane" : "paper-plane-o"} size={16} color={this.state.commentDraft.length ?"#fff":"#333"}/></View>
+          </TouchableOpacity>
+      </View>
+    )
+  },
   _deleteComment(comment:Object){
-    RCTDeviceEventEmitter.emit('showConfirm',ConfirmList);
-    // var _that = this;
-    // let shot =new Shot(this.props.shot);
-    // let newComment = new Comment(shot.id,comment);
-    // newComment.delete().then((Deleted)=>{
-    //   if (Deleted){
-    //     var newComments = this.state.comments.filter(function(value){
-    //       return value !=comment;
-    //     })
-    //     _that._updateComments(newComments);
-    //     _that._showTips("删除评论成功");
-    //   }
-    // })
+    var _that = this;
+    let shot =new Shot(this.props.shot);
+    let newComment = new Comment(shot.id,comment);
+    _that._hideConfirm();
+    newComment.delete().then((Deleted)=>{
+      if (Deleted){
+        var newComments = this.state.comments.filter(function(value){
+          return value !=comment;
+        })
+        _that._updateComments(newComments);
+        _that._showTips("删除评论成功");
+      }
+    })
+  },
+  _showDeleteConfirm(comment:Object){
+    if (this.state.currentUser.id == comment.user.id ){
+      var confirm = this._renderConfirm(comment);
+      RCTDeviceEventEmitter.emit('showConfirm',confirm);
+    }
+  },
+  _hideConfirm(){
+    RCTDeviceEventEmitter.emit('hideConfirm');
+  },
+  _renderConfirm(comment:Object){
+    return (
+      <ConfirmList closeModal={this._hideConfirm} title={"确定删除此评论吗？"} confirm={()=>{this._deleteComment(comment)}}/>
+      )
   },
   _updateComments(newComments){
     this.setState({
@@ -297,7 +323,7 @@ var ShotDetails = React.createClass({
         }else if (action == "player"){
           this.selectPlayer(comment.user)
         }else if (action == "delete"){
-          this._deleteComment(comment)
+          this._showDeleteConfirm(comment);
         }
       }}
       comment={comment} key={comment.id} shot={this.props.shot} />;

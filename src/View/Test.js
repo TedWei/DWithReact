@@ -93,7 +93,16 @@ var Test = React.createClass({
 		this._cancelAnimatedHeart();
 	},
 	_showConfirm(){
-		RCTDeviceEventEmitter.emit('showConfirm',ConfirmList);
+		var confirm = this._renderConfirm();
+		RCTDeviceEventEmitter.emit('showConfirm',confirm);
+	},
+	_hideConfirm(){
+		RCTDeviceEventEmitter.emit('hideConfirm');
+	},
+	_renderConfirm(){
+	  return (
+	    <ConfirmList closeModal={this._hideConfirm} _confirm={this._confirm}/>
+	    )
 	},
 	_renderModal(){
 		var enter = {
